@@ -96,6 +96,7 @@ impl Iterator for Lexer {
 
 impl Lexer {
     /// Creates a new [`Lexer`] from source code.
+    #[allow(unused)]
     pub fn from_source_code<T: AsRef<str>>(source_code: T) -> Lexer {
         Lexer {
             source_code: Box::from(source_code.as_ref()),
