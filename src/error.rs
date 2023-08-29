@@ -15,5 +15,5 @@ pub enum LexError {
     UnrecognisedCharacter(char, usize),
 
     #[error("Unknown error: '{0}'")]
-    UnknownError(&'static str),
+    InternalError(&'static str),
 }
