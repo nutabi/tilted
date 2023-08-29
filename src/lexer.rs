@@ -58,3 +58,14 @@ impl Index<Span> for Lexer {
         &self[index.start_index..(index.end_index - 1)]
     }
 }
+
+impl Lexer {
+    /// Creates a new [`Lexer`] from source code.
+    pub fn from_source_code<T: AsRef<str>>(source_code: T) -> Lexer
+    {
+        Lexer {
+            source_code: Box::from(source_code.as_ref()),
+            current_index: 0,
+        }
+    }
+}
