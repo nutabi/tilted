@@ -2,9 +2,9 @@
 #[macro_export]
 macro_rules! eof {
     ($idx: expr) => {
-        crate::lexer::Token {
-            kind: crate::lexer::TokenKind::Eof,
-            span: crate::lexer::Span {
+        $crate::lexer::Token {
+            kind: $crate::lexer::TokenKind::Eof,
+            span: $crate::lexer::Span {
                 start_index: $idx,
                 end_index: $idx,
             },
@@ -16,9 +16,9 @@ macro_rules! eof {
 #[macro_export]
 macro_rules! token {
     ($kind: expr, $start: expr, $length: expr) => {
-        crate::lexer::Token {
+        $crate::lexer::Token {
             kind: $kind,
-            span: crate::lexer::Span {
+            span: $crate::lexer::Span {
                 start_index: $start,
                 end_index: $start + $length - 1,
             },
