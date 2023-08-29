@@ -1,6 +1,6 @@
 mod error;
-mod macros;
 mod lexer;
+mod macros;
 
 fn main() {
     println!("Hello, world!");
