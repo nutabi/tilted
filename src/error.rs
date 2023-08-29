@@ -11,8 +11,8 @@ pub enum CalError {
 
 #[derive(Debug, thiserror::Error)]
 pub enum LexError {
-    #[error("Unrecognised character '{0}'")]
-    UnrecognisedCharacter(char),
+    #[error("Unrecognised character '{0}' at index '{1}'")]
+    UnrecognisedCharacter(char, usize),
 
     #[error("Unknown error: '{0}'")]
     UnknownError(&'static str),
