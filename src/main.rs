@@ -1,4 +1,5 @@
 mod error;
+mod macros;
 mod lexer;
 
 fn main() {
