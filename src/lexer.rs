@@ -24,10 +24,10 @@ pub struct Lexer {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Token {
     /// Type of this [`Token`].
-    kind: TokenKind,
+    pub kind: TokenKind,
 
     /// Location of this [`Token`].
-    span: Span,
+    pub span: Span,
 }
 
 /// Type of a [`Token`], also containing the information associated.
