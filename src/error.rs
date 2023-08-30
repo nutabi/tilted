@@ -1,6 +1,6 @@
 //! This module implements the error types for `cal`.
 
-use crate::TokenKind;
+use crate::Token;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CalError {
@@ -10,7 +10,7 @@ pub enum CalError {
     #[error("Parse error {0}")]
     ParseError(#[from] ParseError),
 
-    #[error("Unknown error {0}")]
+    #[error("Unknown error: {0}")]
     Unknown(#[from] Box<dyn std::error::Error>),
 }
 
@@ -19,12 +19,46 @@ pub enum LexError {
     #[error("Unrecognised character '{0}' at index '{1}'")]
     UnrecognisedCharacter(char, usize),
 
-    #[error("Unknown error: '{0}'")]
+    #[error("Internal error: {0}")]
     InternalError(&'static str),
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum ParseError {
-    #[error("Expected number, found '{0:?}'")]
-    ExpectedNumber(TokenKind),
+    #[error(
+        "Expected number, found '{:?}' at index {}",
+        .0.kind,
+        .0.span.start_index
+    )]
+    NumberExpected(Token),
+
+    #[error(
+        "Expected operator, found '{:?}' at index {}",
+        .0.kind,
+        .0.span.start_index
+    )]
+    OperatorExpected(Token),
+
+    #[error(
+        "Expected right parenthesis, found '{:?}' at index {}",
+        .0.kind,
+        .0.span.start_index
+    )]
+    RightParenExpected(Token),
+
+    #[error(
+        "Expected unary operator '+' or '-', found '{:?}' at index {}",
+        .0.kind,
+        .0.span.start_index
+    )]
+    InvalidUnaryOperator(Token),
+
+    #[error("Unexpected right parenthesis found at index {0}")]
+    MismatchRightParen(usize),
+
+    #[error("Unknown error: {0}")]
+    InternalError(&'static str),
+
+    #[error("Expected something, found EOF")]
+    UnexpectedEOF,
 }
