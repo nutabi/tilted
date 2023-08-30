@@ -39,7 +39,7 @@ pub enum TokenKind {
     Eof,
 
     /// Integer, i.e. numbers without decimal places.
-    Int(u128),
+    Int(u64),
 
     /// Floating-point number, i.e. real numbers that are not integers.
     Float(f64),
@@ -197,7 +197,7 @@ impl Lexer {
         } else {
             // Integer
             let num = result
-                .parse::<u128>()
+                .parse::<u64>()
                 .map_err(|_| LexError::InternalError("Parse integer failed"))?;
 
             Ok(token!(Int(num), original_index, result.len()))
