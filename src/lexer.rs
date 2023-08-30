@@ -61,10 +61,10 @@ use TokenKind::*;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Span {
     /// Index of the first character of this [`Span`].
-    start_index: usize,
+    pub start_index: usize,
 
     /// Index of the last character of this [`Span`].
-    end_index: usize,
+    pub end_index: usize,
 }
 
 impl<Idx: SliceIndex<str>> Index<Idx> for Lexer {
