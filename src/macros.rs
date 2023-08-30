@@ -1,3 +1,5 @@
+//! This module implements shortcut macros for `cal`.
+
 /// Returns a EOF token at the specified location.
 #[macro_export]
 macro_rules! eof {
