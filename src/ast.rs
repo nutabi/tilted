@@ -1,5 +1,5 @@
 //! This modules implements AST nodes and their evaluation mechanism.
-//! 
+//!
 //! An Abstract Syntax Tree consists of [`Node`]s, which are built by a
 //! [`Parser`](crate::Parser). AST can be evaluated or used to generate code.
 use std::ops::{Add, Div, Mul, Neg, Sub};
@@ -11,6 +11,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 /// [`Parser`](crate::Parser) will automatically converts it to [`i128`].
 #[rustfmt::skip]
 pub trait Number:
+    'static +
     Sized +
     Clone +
     Copy +
