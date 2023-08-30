@@ -3,7 +3,7 @@
 //! A parser's job is to take in a stream of [`Token`](crate::Token) and
 //! produce an Abstract Syntax Tree. The AST can be used to generate code or
 //! evaluate in the future.
-use std::ops::{Add, Div, Neg, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// A convenience trait for [`f64`] and [`i128`] as they are the only two
 /// number types allowed.
@@ -13,6 +13,8 @@ use std::ops::{Add, Div, Neg, Mul, Sub};
 #[rustfmt::skip]
 pub trait Number:
     Sized +
+    Clone +
+    Copy +
     Add<Output = Self> +
     Sub<Output = Self> +
     Neg<Output = Self> +
@@ -28,6 +30,9 @@ pub trait Node<T: Number> {
     fn evaluate(&self) -> T;
 }
 
+/// Convenience type aliase for a [`Node`] stored on the heap.
+pub type NodeBox<T> = Box<dyn Node<T>>;
+
 /// [`BinaryAction`] is an action done by a [`Node`] using two operands.
 pub enum BinaryAction {
     Add,
@@ -39,26 +44,31 @@ pub enum BinaryAction {
 /// [`BinaryNode`] is a [`Node`] that performs an action on two operands.
 pub struct BinaryNode<T: Number> {
     /// Left-hand side operand (if any) of this [`BinaryNode`].
-    left: Box<dyn Node<T>>,
+    left: NodeBox<T>,
 
     /// Action to be performed by this [`BinaryNode`].
     actor: BinaryAction,
 
     /// Right-hand side operand of this [`BinaryNode`].
-    right: Box<dyn Node<T>>,
+    right: NodeBox<T>,
 }
 
+/// [`BinaryAction`] is an action done by a [`Node`] using one operand.
 pub enum UnaryAction {
     Neg,
 }
 
+/// [`BinaryNode`] is a [`Node`] that performs an action on one operand.
 pub struct UnaryNode<T: Number> {
     /// Action to be performed by this [`UnaryNode`].
     actor: UnaryAction,
 
     /// The sole operand of this [`UnaryNode`].
-    operand: Box<dyn Node<T>>,
+    operand: NodeBox<T>,
 }
+
+/// [`PlainNode`] simply stores the numbers without any action.
+pub struct PlainNode<T: Number>(T);
 
 impl BinaryAction {
     pub fn evaluate<T: Number>(&self, left: T, right: T) -> T {
@@ -82,6 +92,18 @@ impl<T: Number> Node<T> for BinaryNode<T> {
     }
 }
 
+impl<T: Number> BinaryNode<T> {
+    /// Creates a new [`BinaryNode`].
+    #[rustfmt::skip]
+    pub fn new(
+        left: NodeBox<T>,
+        actor: BinaryAction,
+        right: NodeBox<T>
+    ) -> BinaryNode<T> {
+        Self { left, actor, right }
+    }
+}
+
 impl UnaryAction {
     pub fn evaluate<T: Number>(&self, operand: T) -> T {
         match self {
@@ -97,5 +119,24 @@ impl<T: Number> Node<T> for UnaryNode<T> {
 
         // Then evaluate this node.
         self.actor.evaluate(operand)
+    }
+}
+
+impl<T: Number> UnaryNode<T> {
+    /// Creates a new [`UnaryNode`].
+    pub fn new(actor: UnaryAction, operand: NodeBox<T>) -> UnaryNode<T> {
+        Self { actor, operand }
+    }
+}
+
+impl<T: Number> Node<T> for PlainNode<T> {
+    fn evaluate(&self) -> T {
+        self.0
+    }
+}
+
+impl<T: Number> PlainNode<T> {
+    pub fn new(value: T) -> PlainNode<T> {
+        Self(value)
     }
 }
