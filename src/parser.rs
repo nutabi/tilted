@@ -2,45 +2,30 @@
 //!
 //! A parser's job is to take in a stream of [`Token`] and produce an Abstract
 //! Syntax Tree. The AST can be used to generate code or evaluate in the future.
-
-use std::marker::PhantomData;
-
 use crate::{
-    error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, PlainNode, TokenKind, UnaryAction,
-    UnaryNode,
+    error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, PlainNode, TokenKind,
+    UnaryAction, UnaryNode,
 };
 
 pub type Result<T> = std::result::Result<T, ParseError>;
 
 #[derive(Debug)]
-pub struct Parser<T> {
+pub struct Parser {
     /// A [`Lexer`] used to retrieve tokens.
     lexer: Lexer,
-    marker: PhantomData<T>,
 }
 
-// expr     = term [+|- term]*
-// term     = factor [*|/ factor]*
-// factor   = atomic
-// atomic   = LeftParen expr RightParen
-//          | Int
-//          | Float
-//          | +|- atomic
-
-impl Parser<f64> {
+impl Parser {
     /// Creates a new [`Parser`] from a [`Lexer`].
-    pub fn new(lexer: Lexer) -> Parser<f64> {
-        Self {
-            lexer,
-            marker: PhantomData,
-        }
+    pub fn new(lexer: Lexer) -> Parser {
+        Self { lexer }
     }
 
-    pub fn parse(&mut self) -> Result<NodeBox<f64>> {
+    pub fn parse(&mut self) -> Result<NodeBox> {
         self.parse_expr()
     }
 
-    fn parse_expr(&mut self) -> Result<NodeBox<f64>> {
+    fn parse_expr(&mut self) -> Result<NodeBox> {
         // Get the first term.
         let mut term = self.parse_term()?;
 
@@ -74,7 +59,7 @@ impl Parser<f64> {
         }
     }
 
-    fn parse_term(&mut self) -> Result<NodeBox<f64>> {
+    fn parse_term(&mut self) -> Result<NodeBox> {
         // Get the first factor.
         let mut factor = self.parse_factor()?;
 
@@ -109,16 +94,16 @@ impl Parser<f64> {
         }
     }
 
-    fn parse_factor(&mut self) -> Result<NodeBox<f64>> {
+    fn parse_factor(&mut self) -> Result<NodeBox> {
         self.parse_atomic()
     }
 
-    fn parse_atomic(&mut self) -> Result<NodeBox<f64>> {
+    fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
         let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
         let node = match next_token.kind {
-            TokenKind::Float(f) => Box::new(PlainNode::new(f)),
-            TokenKind::Int(i) => Box::new(PlainNode::new(i as f64)),
+            TokenKind::Float(f) => Box::new(PlainNode::new(Number::Flt(f))),
+            TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
             TokenKind::LeftParen => {
                 let expr = self.parse_expr()?;
                 let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
