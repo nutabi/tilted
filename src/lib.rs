@@ -1,5 +1,5 @@
-#[deny(clippy::all)]
-#[warn(rustdoc::all)]
+#![deny(clippy::all)]
+#![warn(rustdoc::all)]
 
 mod error;
 mod lexer;
