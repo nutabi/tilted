@@ -1,7 +1,10 @@
 #![deny(clippy::all)]
 #![warn(rustdoc::all)]
 
-mod error;
-mod lexer;
-mod macros;
-mod parser;
+pub mod error;
+pub mod lexer;
+pub mod macros;
+pub mod parser;
+
+pub use error::CalError;
+pub use lexer::{Lexer, Span, Token, TokenKind};
