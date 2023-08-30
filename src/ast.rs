@@ -1,8 +1,7 @@
-//! This modules implements a parser for `cal`.
-//!
-//! A parser's job is to take in a stream of [`Token`](crate::Token) and
-//! produce an Abstract Syntax Tree. The AST can be used to generate code or
-//! evaluate in the future.
+//! This modules implements AST nodes and their evaluation mechanism.
+//! 
+//! An Abstract Syntax Tree consists of [`Node`]s, which are built by a
+//! [`Parser`](crate::Parser). AST can be evaluated or used to generate code.
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// A convenience trait for [`f64`] and [`i128`] as they are the only two
