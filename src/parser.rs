@@ -2,6 +2,8 @@
 //!
 //! A parser's job is to take in a stream of [`Token`] and produce an Abstract
 //! Syntax Tree. The AST can be used to generate code or evaluate in the future.
+use std::iter::Peekable;
+
 use crate::{
     error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, PlainNode, TokenKind,
     UnaryAction, UnaryNode,
@@ -12,13 +14,13 @@ pub type Result<T> = std::result::Result<T, ParseError>;
 #[derive(Debug)]
 pub struct Parser {
     /// A [`Lexer`] used to retrieve tokens.
-    lexer: Lexer,
+    lexer: Peekable<Lexer>,
 }
 
 impl Parser {
     /// Creates a new [`Parser`] from a [`Lexer`].
     pub fn new(lexer: Lexer) -> Parser {
-        Self { lexer }
+        Self { lexer: lexer.peekable() }
     }
 
     /// Generates an AST.
@@ -33,10 +35,10 @@ impl Parser {
         // Loop to get all terms.
         loop {
             // Get the operator.
-            let operator = match self.lexer.next() {
+            let operator = match self.lexer.peek() {
                 Some(tok) => match tok.kind {
                     TokenKind::Op(op) => op,
-                    _ => return Err(ParseError::OperatorExpected(tok)),
+                    _ => return Ok(term),
                 },
                 None => return Ok(term),
             };
@@ -45,17 +47,16 @@ impl Parser {
             let actor = match operator {
                 '+' => BinaryAction::Add,
                 '-' => BinaryAction::Sub,
-                _ => {
-                    return Err(ParseError::InternalError(
-                        "Found operator but not '+' or '-'",
-                    ))
-                }
+                _ => return Ok(term),
             };
 
-            // Get the next term
+            // Consume operator.
+            self.lexer.next();
+
+            // Get the next term.
             let next_term = self.parse_term()?;
 
-            // Create a new node
+            // Create a new node.
             term = Box::new(BinaryNode::new(term, actor, next_term));
         }
     }
@@ -68,10 +69,10 @@ impl Parser {
         // Loop to get all terms.
         loop {
             // Get the operator.
-            let operator = match self.lexer.next() {
+            let operator = match self.lexer.peek() {
                 Some(tok) => match tok.kind {
                     TokenKind::Op(op) => op,
-                    _ => return Err(ParseError::OperatorExpected(tok)),
+                    _ => return Ok(factor),
                 },
                 None => return Ok(factor),
             };
@@ -80,17 +81,16 @@ impl Parser {
             let actor = match operator {
                 '*' => BinaryAction::Mul,
                 '/' => BinaryAction::Div,
-                _ => {
-                    return Err(ParseError::InternalError(
-                        "Found operator but not '*' or '/'",
-                    ))
-                }
+                _ => return Ok(factor),
             };
 
-            // Get the next term
-            let next_factor = self.parse_term()?;
+            // Consume operator.
+            self.lexer.next();
 
-            // Create a new node
+            // Get the next factor.
+            let next_factor = self.parse_factor()?;
+
+            // Create a new node.
             factor = Box::new(BinaryNode::new(factor, actor, next_factor));
         }
     }
@@ -104,7 +104,7 @@ impl Parser {
         let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
         let node = match next_token.kind {
             // Numbers
-            TokenKind::Float(f) => Box::new(PlainNode::new(Number::Flt(f))),
+            TokenKind::Flt(f) => Box::new(PlainNode::new(Number::Flt(f))),
             TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
 
             // Parenthesised expressions.
@@ -135,5 +135,38 @@ impl Parser {
         };
 
         Ok(node)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parser_int() {
+        let source = "7 + 6 * 2 - 4 * (8 + 3)";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Int(-25));
+    }
+
+    #[test]
+    fn test_parser_flt() {
+        let source = "7.0 + 6 * 2 - 4 * (8 + 3)";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Flt(-25.0));
     }
 }
