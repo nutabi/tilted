@@ -2,7 +2,7 @@
 //!
 //! An Abstract Syntax Tree consists of [`Node`]s, which are built by a
 //! [`Parser`](crate::Parser). AST can be evaluated or used to generate code.
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{ops::{Add, Div, Mul, Neg, Sub}, fmt::Display};
 
 /// Internal representation of numbers.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
@@ -81,6 +81,15 @@ impl Neg for Number {
         match self {
             Self::Int(a) => Self::Int(-a),
             Self::Flt(a) => Self::Flt(-a),
+        }
+    }
+}
+
+impl Display for Number {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Flt(n) => write!(f, "{}", n),
+            Self::Int(n) => write!(f, "{}", n),
         }
     }
 }
