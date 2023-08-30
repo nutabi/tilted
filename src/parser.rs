@@ -21,6 +21,7 @@ impl Parser {
         Self { lexer }
     }
 
+    /// Generates an AST.
     pub fn parse(&mut self) -> Result<NodeBox> {
         self.parse_expr()
     }
@@ -102,8 +103,11 @@ impl Parser {
         // Match the next token.
         let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
         let node = match next_token.kind {
+            // Numbers
             TokenKind::Float(f) => Box::new(PlainNode::new(Number::Flt(f))),
             TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
+
+            // Parenthesised expressions.
             TokenKind::LeftParen => {
                 let expr = self.parse_expr()?;
                 let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
@@ -112,6 +116,8 @@ impl Parser {
                     _ => return Err(ParseError::RightParenExpected(next_token)),
                 }
             }
+
+            // Unary operators.
             TokenKind::Op(c) => {
                 let actor = match c {
                     '+' => UnaryAction::Iden,
@@ -121,6 +127,10 @@ impl Parser {
                 let operand = self.parse_atomic()?;
                 Box::new(UnaryNode::new(actor, operand))
             }
+
+            // Invalid:
+            // - EOF: Impossible as next() is used.
+            // - RightParen: Unmatched left parenthesis.
             _ => return Err(ParseError::MismatchRightParen(next_token.span.start_index)),
         };
 
