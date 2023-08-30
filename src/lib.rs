@@ -7,6 +7,6 @@ pub mod lexer;
 pub mod macros;
 pub mod parser;
 
-pub use ast::{BinaryNode, UnaryNode, NodeBox, Number};
+pub use ast::{BinaryAction, BinaryNode, NodeBox, PlainNode, UnaryAction, UnaryNode};
 pub use error::CalError;
 pub use lexer::{Lexer, Span, Token, TokenKind};
