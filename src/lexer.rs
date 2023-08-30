@@ -169,6 +169,7 @@ impl Lexer {
                         // Dot (if not seen)
                         self.current_index += 1;
                         seen_dot = true;
+                        result.push('.');
                     } else {
                         // Dot (if already seen)
                         return Err(LexError::UnrecognisedCharacter(c, self.current_index));
