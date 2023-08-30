@@ -4,3 +4,4 @@
 mod error;
 mod lexer;
 mod macros;
+mod parser;
