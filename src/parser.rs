@@ -20,7 +20,9 @@ pub struct Parser {
 impl Parser {
     /// Creates a new [`Parser`] from a [`Lexer`].
     pub fn new(lexer: Lexer) -> Parser {
-        Self { lexer: lexer.peekable() }
+        Self {
+            lexer: lexer.peekable(),
+        }
     }
 
     /// Generates an AST.
