@@ -239,11 +239,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_lexer() {
+    fn test_lexer_int() {
         let source = "9 + 8 * 4 - (5 - 3)";
         let mut lexer = Lexer::from_source_code(source);
 
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(9));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(8));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(4));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::LeftParen);
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(5));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(3));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::RightParen);
+
+        assert!(lexer.next().is_none());
+    }
+
+    #[test]
+    fn test_lexer_flt() {
+        let source = "9.0 + 8 * 4 - (5 - 3)";
+        let mut lexer = Lexer::from_source_code(source);
+
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Flt(9.0));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(8));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'));
