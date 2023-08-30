@@ -55,6 +55,7 @@ pub struct BinaryNode<T: Number> {
 /// [`BinaryAction`] is an action done by a [`Node`] using one operand.
 pub enum UnaryAction {
     Neg,
+    Iden,
 }
 
 /// [`BinaryNode`] is a [`Node`] that performs an action on one operand.
@@ -107,6 +108,7 @@ impl UnaryAction {
     pub fn evaluate<T: Number>(&self, operand: T) -> T {
         match self {
             Self::Neg => -operand,
+            Self::Iden => operand,
         }
     }
 }
