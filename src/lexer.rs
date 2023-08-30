@@ -42,7 +42,7 @@ pub enum TokenKind {
     Int(u64),
 
     /// Floating-point number, i.e. real numbers that are not integers.
-    Float(f64),
+    Flt(f64),
 
     /// Operator.
     Op(char),
@@ -193,7 +193,7 @@ impl Lexer {
                 .parse::<f64>()
                 .map_err(|_| LexError::InternalError("Parse float failed"))?;
 
-            Ok(token!(Float(num), original_index, result.len()))
+            Ok(token!(Flt(num), original_index, result.len()))
         } else {
             // Integer
             let num = result
