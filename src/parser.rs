@@ -69,11 +69,21 @@ impl Parser {
 
         // Loop to get all factors.
         // Loop to get all terms.
-        loop {
+        loop{
             // Get the operator.
             let operator = match self.lexer.peek() {
                 Some(tok) => match tok.kind {
                     TokenKind::Op(op) => op,
+
+                    // Check for implicit multiplication (left parenthesis)
+                    TokenKind::LeftParen => {
+                        let expr = self.parse_paren_expr()?;
+                        let actor = BinaryAction::Mul;
+                        factor = Box::new(BinaryNode::new(factor, actor, expr));
+                        
+                        continue;
+                    }
+
                     _ => return Ok(factor),
                 },
                 None => return Ok(factor),
