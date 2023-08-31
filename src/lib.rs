@@ -9,4 +9,4 @@ pub mod parser;
 
 pub use ast::{BinaryAction, BinaryNode, NodeBox, Number, PlainNode, UnaryAction, UnaryNode};
 pub use error::CalError;
-pub use lexer::{Lexer, Span, Token, TokenKind};
+pub use lexer::{Lexer, Span, Token, TokenKind, Operator};

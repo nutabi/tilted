@@ -45,13 +45,29 @@ pub enum TokenKind {
     Flt(f64),
 
     /// Operator.
-    Op(char),
+    Op(Operator),
 
     /// Left parenthesis.
     LeftParen,
 
     /// Right parenthesis.
     RightParen,
+}
+
+/// Basic mathematical operators.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Operator {
+    /// Operator `+`.
+    Plus,
+
+    /// Operator `-`
+    Minus,
+
+    /// Operator `*`.
+    Star,
+
+    /// Operator `/`.
+    Slash,
 }
 
 // Improve syntax clarity.
@@ -65,6 +81,21 @@ pub struct Span {
 
     /// Index of the last character of this [`Span`].
     pub end_index: usize,
+}
+
+impl From<char> for Operator {
+    fn from(value: char) -> Self {
+        match value {
+            '+' => Self::Plus,
+            '-' => Self::Minus,
+            '*' => Self::Star,
+            '/' => Self::Slash,
+
+            // This also guards against attempts to add new operators
+            // without implementing its conversion.
+            _ => unreachable!("Unknown operator conversion"),
+        }
+    }
 }
 
 impl<Idx: SliceIndex<str>> Index<Idx> for Lexer {
@@ -219,7 +250,7 @@ impl Lexer {
         match op {
             '+' | '-' | '*' | '/' => {
                 self.current_index += 1;
-                Ok(token!(Op(op), self.current_index - 1, 1))
+                Ok(token!(Op(op.into()), self.current_index - 1, 1))
             }
             _ => Err(LexError::InternalError(
                 "Invalid operator inside operator handler",
@@ -245,14 +276,14 @@ mod tests {
         let mut lexer = Lexer::from_source_code(source);
 
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(9));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(8));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(4));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::LeftParen);
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(5));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(3));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::RightParen);
 
@@ -265,17 +296,27 @@ mod tests {
         let mut lexer = Lexer::from_source_code(source);
 
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Flt(9.0));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('+'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(8));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(4));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::LeftParen);
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(5));
-        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'.into()));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(3));
         assert_eq!(lexer.next().unwrap().kind, TokenKind::RightParen);
 
         assert!(lexer.next().is_none());
+    }
+
+    #[test]
+    fn test_lexer_int_unary_op() {
+        let source = "7 * -5";
+        let mut lexer = Lexer::from_source_code(source);
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(7));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('*'.into()));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Op('-'.into()));
+        assert_eq!(lexer.next().unwrap().kind, TokenKind::Int(5));
     }
 }
