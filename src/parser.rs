@@ -131,14 +131,7 @@ impl Parser {
             TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
 
             // Parenthesised expressions.
-            TokenKind::LeftParen => {
-                let expr = self.parse_expr()?;
-                let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
-                match next_token.kind {
-                    TokenKind::RightParen => expr,
-                    _ => return Err(ParseError::RightParenExpected(next_token)),
-                }
-            }
+            TokenKind::LeftParen => self.parse_paren_expr()?,
 
             // Invalid unary operators, valid ones were handled up top.
             TokenKind::Op(_) => return Err(ParseError::InvalidUnaryOperator(next_token)),
@@ -150,6 +143,27 @@ impl Parser {
         };
 
         Ok(node)
+    }
+
+    fn parse_paren_expr(&mut self) -> Result<NodeBox> {
+        // Expect a left parenthesis.
+        let token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
+        if token.kind != TokenKind::LeftParen {
+            unreachable!()
+        }
+
+        // Parse expression.
+        // Errors need to be return immediately as the lexer might be in an
+        // unusable state.
+        let expr = self.parse_expr()?;
+
+        // Expect a right parenthesis.
+        let token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
+        if token.kind != TokenKind::LeftParen {
+            return Err(ParseError::MismatchRightParen(token.span.start_index));
+        };
+
+        Ok(expr)
     }
 }
 
