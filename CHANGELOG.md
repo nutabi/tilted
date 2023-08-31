@@ -1,10 +1,7 @@
 # Changelog for `cal`
 
-## Version 0.1
+## Version 0.1.1
 
-- Added support for implicit multiplication
+Added support for implicit multiplication ([`b560ed8f`])
 
-- Re-factored the handler for parenthesed expressions to prepare for implicit
-multiplication ([`#415657f`])
-
-[`#415657f`]: https://github.com/cal/commit/
+[`b560ed8f`]: https://github.com/SaltedPeanutButter/cal/commit/b560ed8f5b6202e5ffd145910cc117e826ad6c8f
