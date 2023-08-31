@@ -6,7 +6,7 @@ use std::iter::Peekable;
 
 use crate::{
     error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, PlainNode, TokenKind,
-    UnaryAction, UnaryNode,
+    UnaryAction, UnaryNode, Operator,
 };
 
 pub type Result<T> = std::result::Result<T, ParseError>;
@@ -47,8 +47,8 @@ impl Parser {
 
             // Match operator to actor.
             let actor = match operator {
-                '+' => BinaryAction::Add,
-                '-' => BinaryAction::Sub,
+                Operator::Plus => BinaryAction::Add,
+                Operator::Minus => BinaryAction::Sub,
                 _ => return Ok(term),
             };
 
@@ -81,8 +81,8 @@ impl Parser {
 
             // Match operator to actor.
             let actor = match operator {
-                '*' => BinaryAction::Mul,
-                '/' => BinaryAction::Div,
+                Operator::Star => BinaryAction::Mul,
+                Operator::Slash => BinaryAction::Div,
                 _ => return Ok(factor),
             };
 
@@ -98,14 +98,35 @@ impl Parser {
     }
 
     fn parse_factor(&mut self) -> Result<NodeBox> {
-        self.parse_atomic()
+        // Check for unary operator.
+        let next_token = self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
+        let actor = match next_token.kind {
+            TokenKind::Op(c) => match c {
+                Operator::Plus => UnaryAction::Iden,
+                Operator::Minus => UnaryAction::Neg,
+
+                // Invalid unary operator, will get reported by parse_atomic.
+                _ => return self.parse_atomic(),
+            },
+
+            // No unary operator.
+            _ => return self.parse_atomic(),
+        };
+
+        // Consume operator.
+        self.lexer.next();
+
+        // Parse atomic.
+        let operand = self.parse_atomic()?;
+        
+        Ok(Box::new(UnaryNode::new(actor, operand)))
     }
 
     fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
         let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
         let node = match next_token.kind {
-            // Numbers
+            // Numbers (parse_numbers is merged here).
             TokenKind::Flt(f) => Box::new(PlainNode::new(Number::Flt(f))),
             TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
 
@@ -119,16 +140,8 @@ impl Parser {
                 }
             }
 
-            // Unary operators.
-            TokenKind::Op(c) => {
-                let actor = match c {
-                    '+' => UnaryAction::Iden,
-                    '-' => UnaryAction::Neg,
-                    _ => return Err(ParseError::InvalidUnaryOperator(next_token)),
-                };
-                let operand = self.parse_atomic()?;
-                Box::new(UnaryNode::new(actor, operand))
-            }
+            // Invalid unary operators, valid ones were handled up top.
+            TokenKind::Op(_) => return Err(ParseError::InvalidUnaryOperator(next_token)),
 
             // Invalid:
             // - EOF: Impossible as next() is used.
@@ -170,5 +183,33 @@ mod tests {
         let value = node.unwrap().evaluate();
 
         assert_eq!(value, Number::Flt(-25.0));
+    }
+
+    #[test]
+    fn test_parser_int_unary_op() {
+        let source = "7 * -5";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+        
+        assert_eq!(value, Number::Int(-35));
+    }
+
+    #[test]
+    fn test_parser_flt_unary_op() {
+        let source = "7.0 * -5";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+        
+        assert_eq!(value, Number::Flt(-35.0));
     }
 }
