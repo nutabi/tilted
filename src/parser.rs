@@ -69,7 +69,7 @@ impl Parser {
 
         // Loop to get all factors.
         // Loop to get all terms.
-        loop{
+        loop {
             // Get the operator.
             let operator = match self.lexer.peek() {
                 Some(tok) => match tok.kind {
@@ -80,7 +80,7 @@ impl Parser {
                         let expr = self.parse_paren_expr()?;
                         let actor = BinaryAction::Mul;
                         factor = Box::new(BinaryNode::new(factor, actor, expr));
-                        
+
                         continue;
                     }
 
@@ -240,5 +240,19 @@ mod tests {
         let value = node.unwrap().evaluate();
 
         assert_eq!(value, Number::Flt(-35.0));
+    }
+
+    #[test]
+    fn test_parser_impl_mul() {
+        let source = "5(7 + 2)";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Int(45));
     }
 }
