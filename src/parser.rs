@@ -159,7 +159,7 @@ impl Parser {
 
         // Expect a right parenthesis.
         let token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
-        if token.kind != TokenKind::LeftParen {
+        if token.kind != TokenKind::RightParen {
             return Err(ParseError::MismatchRightParen(token.span.start_index));
         };
 
