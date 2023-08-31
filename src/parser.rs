@@ -5,8 +5,8 @@
 use std::iter::Peekable;
 
 use crate::{
-    error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, PlainNode, TokenKind,
-    UnaryAction, UnaryNode, Operator,
+    error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, Operator, PlainNode,
+    TokenKind, UnaryAction, UnaryNode,
 };
 
 pub type Result<T> = std::result::Result<T, ParseError>;
@@ -118,7 +118,7 @@ impl Parser {
 
         // Parse atomic.
         let operand = self.parse_atomic()?;
-        
+
         Ok(Box::new(UnaryNode::new(actor, operand)))
     }
 
@@ -195,7 +195,7 @@ mod tests {
         assert!(node.is_ok());
 
         let value = node.unwrap().evaluate();
-        
+
         assert_eq!(value, Number::Int(-35));
     }
 
@@ -209,7 +209,7 @@ mod tests {
         assert!(node.is_ok());
 
         let value = node.unwrap().evaluate();
-        
+
         assert_eq!(value, Number::Flt(-35.0));
     }
 }
