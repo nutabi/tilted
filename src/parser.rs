@@ -124,7 +124,7 @@ impl Parser {
 
     fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
-        let next_token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
+        let next_token = *self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
         let node = match next_token.kind {
             // Numbers (parse_numbers is merged here).
             TokenKind::Flt(f) => Box::new(PlainNode::new(Number::Flt(f))),
@@ -141,6 +141,11 @@ impl Parser {
             // - RightParen: Unmatched left parenthesis.
             _ => return Err(ParseError::MismatchRightParen(next_token.span.start_index)),
         };
+
+        // Consume token.
+        if next_token.kind != TokenKind::LeftParen {
+            self.lexer.next();
+        }
 
         Ok(node)
     }
