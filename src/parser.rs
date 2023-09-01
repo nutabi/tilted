@@ -116,31 +116,41 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// factor = [+-] atomic
+    /// factor = [+-]* atomic
     /// ```
     fn parse_factor(&mut self) -> Result<NodeBox> {
-        // Check for unary operator.
+        // Check for unary operator(s).
+        let mut actor = UnaryAction::Iden;
+        loop {
         let next_token = self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
-        let actor = match next_token.kind {
+            match next_token.kind {
             TokenKind::Op(c) => match c {
-                Operator::Plus => UnaryAction::Iden,
-                Operator::Minus => UnaryAction::Neg,
+                    Operator::Plus => (),
+                    Operator::Minus => if actor == UnaryAction::Iden {
+                        actor = UnaryAction::Neg;
+                    } else {
+                        actor = UnaryAction::Iden;
+                    },
 
-                // Invalid unary operator, will get reported by parse_atomic.
-                _ => return self.parse_atomic(),
+                    // Invalid unary operator.
+                    _ => return Err(ParseError::InvalidUnaryOperator(*next_token)),
             },
 
-            // No unary operator.
-            _ => return self.parse_atomic(),
+                // No more unary operator.
+                _ => break,
         };
 
         // Consume operator.
         self.lexer.next();
-
+        }
         // Parse atomic.
         let operand = self.parse_atomic()?;
 
+        if actor == UnaryAction::Iden {
+            Ok(operand)
+        } else {
         Ok(Box::new(UnaryNode::new(actor, operand)))
+    }
     }
 
     /// Production:
