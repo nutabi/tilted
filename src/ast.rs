@@ -3,7 +3,7 @@
 //! An Abstract Syntax Tree consists of [`Node`]s, which are built by a
 //! [`Parser`](crate::Parser). AST can be evaluated or used to generate code.
 use std::{
-    fmt::Display,
+    fmt::{Display, Debug},
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
@@ -98,7 +98,7 @@ impl Display for Number {
 }
 
 /// [`Node`] provides a blanket trait for both [`BinaryNode`] and [`UnaryNode`].
-pub trait Node {
+pub trait Node: Debug {
     /// Finds the value of this [`Node`].
     fn evaluate(&self) -> Number;
 }
@@ -107,6 +107,7 @@ pub trait Node {
 pub type NodeBox = Box<dyn Node>;
 
 /// [`BinaryAction`] is an action done by a [`Node`] using two operands.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinaryAction {
     Add,
     Sub,
@@ -115,6 +116,7 @@ pub enum BinaryAction {
 }
 
 /// [`BinaryNode`] is a [`Node`] that performs an action on two operands.
+#[derive(Debug)]
 pub struct BinaryNode {
     /// Left-hand side operand (if any) of this [`BinaryNode`].
     left: NodeBox,
@@ -127,12 +129,14 @@ pub struct BinaryNode {
 }
 
 /// [`BinaryAction`] is an action done by a [`Node`] using one operand.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UnaryAction {
     Neg,
     Iden,
 }
 
 /// [`BinaryNode`] is a [`Node`] that performs an action on one operand.
+#[derive(Debug)]
 pub struct UnaryNode {
     /// Action to be performed by this [`UnaryNode`].
     actor: UnaryAction,
@@ -142,6 +146,7 @@ pub struct UnaryNode {
 }
 
 /// [`PlainNode`] simply stores the numbers without any action.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PlainNode(Number);
 
 impl BinaryAction {
