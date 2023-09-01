@@ -284,4 +284,32 @@ mod tests {
 
         assert_eq!(value, Number::Int(45));
     }
+
+    #[test]
+    fn test_parser_many_unary_op() {
+        let source = "--+5";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Int(5));
+    }
+
+    #[test]
+    fn test_parser_weird_expr() {
+        let source = "2*-(3*(1+-(2)))";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::new(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Int(6));
+    }
 }
