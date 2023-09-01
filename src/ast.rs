@@ -3,7 +3,7 @@
 //! An Abstract Syntax Tree consists of [`Node`]s, which are built by a
 //! [`Parser`](crate::Parser). AST can be evaluated or used to generate code.
 use std::{
-    fmt::{Display, Debug},
+    fmt::{Debug, Display},
     ops::{Add, Div, Mul, Neg, Sub},
 };
 

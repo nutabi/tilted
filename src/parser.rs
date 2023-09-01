@@ -122,26 +122,28 @@ impl Parser {
         // Check for unary operator(s).
         let mut actor = UnaryAction::Iden;
         loop {
-        let next_token = self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
+            let next_token = self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
             match next_token.kind {
-            TokenKind::Op(c) => match c {
+                TokenKind::Op(c) => match c {
                     Operator::Plus => (),
-                    Operator::Minus => if actor == UnaryAction::Iden {
-                        actor = UnaryAction::Neg;
-                    } else {
-                        actor = UnaryAction::Iden;
-                    },
+                    Operator::Minus => {
+                        if actor == UnaryAction::Iden {
+                            actor = UnaryAction::Neg;
+                        } else {
+                            actor = UnaryAction::Iden;
+                        }
+                    }
 
                     // Invalid unary operator.
                     _ => return Err(ParseError::InvalidUnaryOperator(*next_token)),
-            },
+                },
 
                 // No more unary operator.
                 _ => break,
-        };
+            };
 
-        // Consume operator.
-        self.lexer.next();
+            // Consume operator.
+            self.lexer.next();
         }
         // Parse atomic.
         let operand = self.parse_atomic()?;
@@ -149,8 +151,8 @@ impl Parser {
         if actor == UnaryAction::Iden {
             Ok(operand)
         } else {
-        Ok(Box::new(UnaryNode::new(actor, operand)))
-    }
+            Ok(Box::new(UnaryNode::new(actor, operand)))
+        }
     }
 
     /// Production:
