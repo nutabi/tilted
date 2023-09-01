@@ -30,6 +30,10 @@ impl Parser {
         self.parse_expr()
     }
 
+    /// Production:
+    /// ```text
+    /// expr = term ([+-] term)*
+    /// ```
     fn parse_expr(&mut self) -> Result<NodeBox> {
         // Get the first term.
         let mut term = self.parse_term()?;
@@ -63,12 +67,15 @@ impl Parser {
         }
     }
 
+    /// Production:
+    /// ```text
+    /// term = factor ([*/]? factor)*
+    /// ```
     fn parse_term(&mut self) -> Result<NodeBox> {
         // Get the first factor.
         let mut factor = self.parse_factor()?;
 
         // Loop to get all factors.
-        // Loop to get all terms.
         loop {
             // Get the operator.
             let operator = match self.lexer.peek() {
@@ -107,6 +114,10 @@ impl Parser {
         }
     }
 
+    /// Production:
+    /// ```text
+    /// factor = [+-] atomic
+    /// ```
     fn parse_factor(&mut self) -> Result<NodeBox> {
         // Check for unary operator.
         let next_token = self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
@@ -132,6 +143,10 @@ impl Parser {
         Ok(Box::new(UnaryNode::new(actor, operand)))
     }
 
+    /// Production:
+    /// ```text
+    /// atomic = Int | Flt | paren_expr
+    /// ```
     fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
         let next_token = *self.lexer.peek().ok_or(ParseError::UnexpectedEOF)?;
@@ -160,6 +175,10 @@ impl Parser {
         Ok(node)
     }
 
+    /// Production:
+    /// ```text
+    /// paren_expr = ( expr )
+    /// ```
     fn parse_paren_expr(&mut self) -> Result<NodeBox> {
         // Expect a left parenthesis.
         let token = self.lexer.next().ok_or(ParseError::UnexpectedEOF)?;
