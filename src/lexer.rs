@@ -164,6 +164,7 @@ impl Lexer {
             .nth(self.current_index)
             .ok_or(LexError::InternalError(
                 "Unable to unwrap next character in source",
+                self.current_index,
             ))? {
             // Numbers (integers and reals)
             // Can start with a dot or number
@@ -229,14 +230,14 @@ impl Lexer {
             // Float
             let num = result
                 .parse::<f64>()
-                .map_err(|_| LexError::InternalError("Parse float failed"))?;
+                .map_err(|_| LexError::InternalError("Parse float failed", self.current_index))?;
 
             Ok(token!(Flt(num), original_index, result.len()))
         } else {
             // Integer
             let num = result
                 .parse::<u64>()
-                .map_err(|_| LexError::InternalError("Parse integer failed"))?;
+                .map_err(|_| LexError::InternalError("Parse integer failed", self.current_index))?;
 
             Ok(token!(Int(num), original_index, result.len()))
         }
@@ -248,7 +249,7 @@ impl Lexer {
             .source_code
             .chars()
             .nth(self.current_index)
-            .ok_or(LexError::InternalError("Unable to unwrap operator"))?;
+            .ok_or(LexError::InternalError("Unable to unwrap operator", self.current_index))?;
 
         // The parent match operator should have narrowed down the valid ones,
         // but I think it is still important to check here, just in case I mess
@@ -260,6 +261,7 @@ impl Lexer {
             }
             _ => Err(LexError::InternalError(
                 "Invalid operator inside operator handler",
+                self.current_index,
             )),
         }
     }
