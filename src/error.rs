@@ -1,64 +1,110 @@
-//! This module implements the error types for `cal`.
-
+//! This module implements the error types for [`cal`](crate).
+use std::{error::Error, fmt::Display};
 use crate::Token;
 
-#[derive(Debug, thiserror::Error)]
+/// Errors returned by [`cal`](crate)
+#[derive(Debug)]
 pub enum CalError {
-    #[error("Lex error {0}")]
-    LexError(#[from] LexError),
+    /// Errors returned by [`Lexer`](crate::Lexer).
+    Lex(LexError),
 
-    #[error("Parse error {0}")]
-    ParseError(#[from] ParseError),
+    /// Errors returned by [`Parser`](crate::Parser).
+    Parse(ParseError),
 
-    #[error("Unknown error: {0}")]
-    Unknown(#[from] Box<dyn std::error::Error>),
+    /// Errors from other sources.
+    Unknown(Box<dyn Error>),
 }
 
-#[derive(Debug, thiserror::Error)]
+/// Errors returned by [`Lexer`](crate::Lexer).
+#[derive(Debug, Clone)]
 pub enum LexError {
-    #[error("Unrecognised character '{0}' at index '{1}'")]
+    /// Character is not part of any [`Token`](crate::Token).
     UnrecognisedCharacter(char, usize),
 
-    #[error("Internal error: {0}")]
-    InternalError(&'static str),
+    /// Errors caused by parsing valid but unexpected user input.
+    InternalError(&'static str, usize),
 }
 
-#[derive(Debug, thiserror::Error)]
+/// Errors returned by [`Parser`](crate::Parser).
+#[derive(Debug, Clone)]
 pub enum ParseError {
-    #[error(
-        "Expected number, found '{:?}' at index {}",
-        .0.kind,
-        .0.span.start_index
-    )]
+    /// Expected a token, found end-of-file.
+    UnexpectedEOF,
+
+    /// Expected a number, found something else.
     NumberExpected(Token),
 
-    #[error(
-        "Expected operator, found '{:?}' at index {}",
-        .0.kind,
-        .0.span.start_index
-    )]
+    /// Expected an operator, found something else.
     OperatorExpected(Token),
 
-    #[error(
-        "Expected right parenthesis, found '{:?}' at index {}",
-        .0.kind,
-        .0.span.start_index
-    )]
+    /// Expected a right parenthesis, found something else.
     RightParenExpected(Token),
 
-    #[error(
-        "Expected unary operator '+' or '-', found '{:?}' at index {}",
-        .0.kind,
-        .0.span.start_index
-    )]
+    /// Found an invalid unary operator.
     InvalidUnaryOperator(Token),
 
-    #[error("Unexpected right parenthesis found at index {0}")]
+    /// Found a right parenthesis without a matching left parenthesis.
     MismatchRightParen(usize),
 
-    #[error("Unknown error: {0}")]
+    /// Errors caused by parsing valid but unexpected user input.
     InternalError(&'static str),
-
-    #[error("Expected something, found EOF")]
-    UnexpectedEOF,
 }
+
+impl Display for CalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Lex(e) => write!(f, "{}", e),
+            Self::Parse(e) => write!(f, "{}", e),
+            Self::Unknown(e) => write!(f, "{}", e),
+        }
+    }
+}
+
+impl Error for CalError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Lex(e) => Some(e),
+            Self::Parse(e) => Some(e),
+            Self::Unknown(e) => Some(e.as_ref()),
+        }
+    }
+}
+
+impl From<LexError> for CalError {
+    fn from(value: LexError) -> Self {
+        Self::Lex(value)
+    }
+}
+
+impl From<ParseError> for CalError {
+    fn from(value: ParseError) -> Self {
+        Self::Parse(value)
+    }
+}
+
+impl Display for LexError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::UnrecognisedCharacter(c, i) => write!(f, "Unrecognised character '{}' at index {}", c, i),
+            Self::InternalError(e, i) => write!(f, "{} at index {}", e, i),
+        }
+    }
+}
+
+impl Error for LexError { }
+
+impl Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::UnexpectedEOF => write!(f, "Unexpected end-of-file"),
+            Self::NumberExpected(t) => write!(f, "Expected a number, found {}", t),
+            Self::OperatorExpected(t) => write!(f, "Expected an operator, found {}", t),
+            Self::RightParenExpected(t) => write!(f, "Expected a right parenthesis, found {}", t),
+            Self::InvalidUnaryOperator(t) => write!(f, "Found an invalid unary operator {}", t),
+            Self::MismatchRightParen(i) => write!(f, "Found a right parenthesis without a matching left one at index {}", i),
+            Self::InternalError(s) => write!(f, "{}", s),
+        }
+    }
+}
+
+impl Error for ParseError { }
