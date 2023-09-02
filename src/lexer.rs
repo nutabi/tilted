@@ -3,7 +3,7 @@
 //! A lexer's job is to generate a stream of [`Token`]s from user input, which
 //! is used by the [`Parser`] to generate an Abstract Syntax Tree.
 
-use std::{ops::Index, slice::SliceIndex};
+use std::{ops::Index, slice::SliceIndex, fmt::Display};
 
 use crate::{eof, error::LexError, token};
 
@@ -81,6 +81,12 @@ pub struct Span {
 
     /// Index of the last character of this [`Span`].
     pub end_index: usize,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?} at index {}", self.kind, self.span.start_index)
+    }
 }
 
 impl From<char> for Operator {
