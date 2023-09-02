@@ -5,7 +5,7 @@
 use std::iter::Peekable;
 
 use crate::{
-    error::ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, Operator, PlainNode,
+    ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, Operator, PlainNode,
     TokenKind, UnaryAction, UnaryNode,
 };
 
