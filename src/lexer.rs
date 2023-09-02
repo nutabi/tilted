@@ -3,9 +3,9 @@
 //! A lexer's job is to generate a stream of [`Token`]s from user input, which
 //! is used by the [`Parser`] to generate an Abstract Syntax Tree.
 
-use std::{ops::Index, slice::SliceIndex, fmt::Display};
+use std::{fmt::Display, ops::Index, slice::SliceIndex};
 
-use crate::{eof, LexError, token};
+use crate::{eof, token, LexError};
 
 /// Special [`Result`] type for the lexer.
 type Result<T> = std::result::Result<T, LexError>;
@@ -245,11 +245,14 @@ impl Lexer {
 
     pub fn handle_operator(&mut self) -> Result<Token> {
         // Operator has only one char so it should be trivial.
-        let op = self
-            .source_code
-            .chars()
-            .nth(self.current_index)
-            .ok_or(LexError::InternalError("Unable to unwrap operator", self.current_index))?;
+        let op =
+            self.source_code
+                .chars()
+                .nth(self.current_index)
+                .ok_or(LexError::InternalError(
+                    "Unable to unwrap operator",
+                    self.current_index,
+                ))?;
 
         // The parent match operator should have narrowed down the valid ones,
         // but I think it is still important to check here, just in case I mess
