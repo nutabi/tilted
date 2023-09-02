@@ -1,10 +1,10 @@
-//! This module implements the error types for [`cal`](crate).
+//! This module implements the error types for [`tilted`](crate).
 use crate::Token;
 use std::{error::Error, fmt::Display};
 
-/// Errors returned by [`cal`](crate)
+/// Errors returned by [`tilted`](crate)
 #[derive(Debug)]
-pub enum CalError {
+pub enum TilError {
     /// Errors returned by [`Lexer`](crate::Lexer).
     Lex(LexError),
 
@@ -50,7 +50,7 @@ pub enum ParseError {
     InternalError(&'static str),
 }
 
-impl Display for CalError {
+impl Display for TilError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Lex(e) => write!(f, "{}", e),
@@ -60,7 +60,7 @@ impl Display for CalError {
     }
 }
 
-impl Error for CalError {
+impl Error for TilError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::Lex(e) => Some(e),
@@ -70,13 +70,13 @@ impl Error for CalError {
     }
 }
 
-impl From<LexError> for CalError {
+impl From<LexError> for TilError {
     fn from(value: LexError) -> Self {
         Self::Lex(value)
     }
 }
 
-impl From<ParseError> for CalError {
+impl From<ParseError> for TilError {
     fn from(value: ParseError) -> Self {
         Self::Parse(value)
     }

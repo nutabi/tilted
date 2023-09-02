@@ -1,4 +1,4 @@
-//! This modules implements a lexer, or tokeniser, for `cal`.
+//! This modules implements a lexer, or tokeniser, for [`tilted`](crate).
 //!
 //! A lexer's job is to generate a stream of [`Token`]s from user input, which
 //! is used by the [`Parser`] to generate an Abstract Syntax Tree.
@@ -10,7 +10,7 @@ use crate::{eof, token, LexError};
 /// Special [`Result`] type for the lexer.
 type Result<T> = std::result::Result<T, LexError>;
 
-/// Lexer for `cal`. It parses user input and return [`Token`]s.
+/// Lexer for [`tilted`](crate). It parses user input and return [`Token`]s.
 #[derive(Debug, Clone)]
 pub struct Lexer {
     /// The original source code that is passed in.

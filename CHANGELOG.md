@@ -1,4 +1,4 @@
-# Changelog for `cal`
+# Changelog for `titled`
 
 ## Version 0.1.1
 

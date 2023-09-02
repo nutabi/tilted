@@ -1,4 +1,4 @@
-//! This modules implements a parser for `cal`.
+//! This modules implements a parser for [`tilted`](crate).
 //!
 //! A parser's job is to take in a stream of [`Token`] and produce an Abstract
 //! Syntax Tree. The AST can be used to generate code or evaluate in the future.

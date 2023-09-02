@@ -1,4 +1,4 @@
-//! This module implements shortcut macros for `cal`.
+//! This module implements shortcut macros for [`tilted`](crate).
 
 /// Returns a EOF token at the specified location.
 #[macro_export]
