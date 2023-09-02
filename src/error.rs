@@ -1,6 +1,6 @@
 //! This module implements the error types for [`cal`](crate).
-use std::{error::Error, fmt::Display};
 use crate::Token;
+use std::{error::Error, fmt::Display};
 
 /// Errors returned by [`cal`](crate)
 #[derive(Debug)]
@@ -85,13 +85,15 @@ impl From<ParseError> for CalError {
 impl Display for LexError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::UnrecognisedCharacter(c, i) => write!(f, "Unrecognised character '{}' at index {}", c, i),
+            Self::UnrecognisedCharacter(c, i) => {
+                write!(f, "Unrecognised character '{}' at index {}", c, i)
+            }
             Self::InternalError(e, i) => write!(f, "{} at index {}", e, i),
         }
     }
 }
 
-impl Error for LexError { }
+impl Error for LexError {}
 
 impl Display for ParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -101,10 +103,14 @@ impl Display for ParseError {
             Self::OperatorExpected(t) => write!(f, "Expected an operator, found {}", t),
             Self::RightParenExpected(t) => write!(f, "Expected a right parenthesis, found {}", t),
             Self::InvalidUnaryOperator(t) => write!(f, "Found an invalid unary operator {}", t),
-            Self::MismatchRightParen(i) => write!(f, "Found a right parenthesis without a matching left one at index {}", i),
+            Self::MismatchRightParen(i) => write!(
+                f,
+                "Found a right parenthesis without a matching left one at index {}",
+                i
+            ),
             Self::InternalError(s) => write!(f, "{}", s),
         }
     }
 }
 
-impl Error for ParseError { }
+impl Error for ParseError {}

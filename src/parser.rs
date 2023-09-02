@@ -5,8 +5,8 @@
 use std::iter::Peekable;
 
 use crate::{
-    ParseError, BinaryAction, BinaryNode, Lexer, NodeBox, Number, Operator, PlainNode,
-    TokenKind, UnaryAction, UnaryNode,
+    BinaryAction, BinaryNode, Lexer, NodeBox, Number, Operator, ParseError, PlainNode, TokenKind,
+    UnaryAction, UnaryNode,
 };
 
 pub type Result<T> = std::result::Result<T, ParseError>;
