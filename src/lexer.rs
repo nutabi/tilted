@@ -5,7 +5,7 @@
 
 use std::{ops::Index, slice::SliceIndex, fmt::Display};
 
-use crate::{eof, error::LexError, token};
+use crate::{eof, LexError, token};
 
 /// Special [`Result`] type for the lexer.
 type Result<T> = std::result::Result<T, LexError>;
