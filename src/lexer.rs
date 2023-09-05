@@ -70,7 +70,7 @@ pub enum Operator {
     Slash,
 
     /// Operator `^`.
-    Carat,
+    Caret,
 }
 
 // Improve syntax clarity.
@@ -99,7 +99,7 @@ impl From<char> for Operator {
             '-' => Self::Minus,
             '*' => Self::Star,
             '/' => Self::Slash,
-            '^' => Self::Carat,
+            '^' => Self::Caret,
 
             // This also guards against attempts to add new operators
             // without implementing its conversion.
