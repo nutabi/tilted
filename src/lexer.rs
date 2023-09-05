@@ -68,6 +68,9 @@ pub enum Operator {
 
     /// Operator `/`.
     Slash,
+
+    /// Operator `^`.
+    Carat,
 }
 
 // Improve syntax clarity.
@@ -96,6 +99,7 @@ impl From<char> for Operator {
             '-' => Self::Minus,
             '*' => Self::Star,
             '/' => Self::Slash,
+            '^' => Self::Carat,
 
             // This also guards against attempts to add new operators
             // without implementing its conversion.
@@ -171,7 +175,7 @@ impl Lexer {
             '.' | '0'..='9' => self.handle_number(),
 
             // Operators.
-            '+' | '-' | '*' | '/' => self.handle_operator(),
+            '+' | '-' | '*' | '/' | '^' => self.handle_operator(),
 
             // Parentheses.
             // These are short so they are handled in-place.
@@ -258,7 +262,7 @@ impl Lexer {
         // but I think it is still important to check here, just in case I mess
         // up somewhere else. Resources are cheap anyway :)
         match op {
-            '+' | '-' | '*' | '/' => {
+            '+' | '-' | '*' | '/' | '^' => {
                 self.current_index += 1;
                 Ok(token!(Op(op.into()), self.current_index - 1, 1))
             }
