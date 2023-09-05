@@ -2,15 +2,15 @@
 
 ## Unreleased
 
-- Added a command-line interface [`409df2cd`]
+- Added a command-line interface [`1629b6d9`]
 
-- Added support for a caret operator `^` and exponentiation [`3a40825f`]
+- Added support for a caret operator `^` and exponentiation [`9ecb628f`]
 
 - Fixed an error-by-design that caused errors during lexical analysis to be ignored [`01dd2d6f`]
 
-[`409df2cd`]: https://github.com/SaltedPeanutButter/cal/commit/409df2cdfb007e3a0a3568b0b0d61fb964dbaa30
+[`1629b6d9`]: https://github.com/SaltedPeanutButter/cal/commit/1629b6d9ad6cf17ec4e5924add407847bff929a4
+[`9ecb628f`]: https://github.com/SaltedPeanutButter/cal/commit/9ecb628fc13d5e82c54a8c3cb27bf8dbd2aaa110
 [`01dd2d6f`]: https://github.com/SaltedPeanutButter/cal/commit/01dd2d6f68d1c1a1794cf8576e45e0c10c4e9b54
-[`3a40825f`]: https://github.com/SaltedPeanutButter/cal/commit/3a40825f987d95f9256b203c13f258f9779723d5
 
 ## Version 0.1.1
 
