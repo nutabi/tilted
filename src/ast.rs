@@ -113,6 +113,7 @@ pub enum BinaryAction {
     Sub,
     Mul,
     Div,
+    Pow,
 }
 
 /// [`BinaryNode`] is a [`Node`] that performs an action on two operands.
@@ -156,6 +157,29 @@ impl BinaryAction {
             Self::Sub => left - right,
             Self::Mul => left * right,
             Self::Div => left / right,
+            Self::Pow => {
+                // Integer base and exponent are kept as integer.
+                if let Number::Int(n) = left {
+                    if let Number::Int(m) = right {
+                        if m >= 0 {
+                            return Number::Int(n.pow(m as u32));
+                        } else {
+                            return Number::Flt((n as f64).powf(m as f64));
+                        }
+                    }
+                }
+
+                // Otherwise, both are converted to float.
+                let left = match left {
+                    Number::Int(n) => n as f64,
+                    Number::Flt(n) => n,
+                };
+                let right = match right {
+                    Number::Int(n) => n as f64,
+                    Number::Flt(n) => n,
+                };
+                Number::Flt(left.powf(right))
+            }
         }
     }
 }
