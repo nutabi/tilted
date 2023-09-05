@@ -115,7 +115,7 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// factor = [+-]* atomic
+    /// factor = [+-]* pow
     /// ```
     fn parse_factor(&mut self) -> Result<NodeBox> {
         // Check for unary operator(s).
@@ -147,13 +147,36 @@ impl Parser {
         }
 
         // Parse atomic.
-        let operand = self.parse_atomic()?;
+        let operand = self.parse_pow()?;
 
         if actor == UnaryAction::Iden {
             Ok(operand)
         } else {
             Ok(Box::new(UnaryNode::new(actor, operand)))
         }
+    }
+
+    /// Production:
+    /// ```text
+    /// pow = atomic (^ expr)?
+    /// ```
+    fn parse_pow(&mut self) -> Result<NodeBox> {
+        // Parse base.
+        let base = self.parse_atomic()?;
+
+        // Check for exponentiation.
+        if self.current_token.kind != TokenKind::Op(Operator::Caret) {
+            return Ok(base);
+        }
+
+        // Consume operator.
+        self.lex_and_store()?;
+
+        // Parse exponent.
+        let exponent = self.parse_expr()?;
+
+        // Create a new node.
+        Ok(Box::new(BinaryNode::new(base, BinaryAction::Pow, exponent)))
     }
 
     /// Production:
@@ -332,5 +355,19 @@ mod tests {
         let value = node.unwrap().evaluate();
 
         assert_eq!(value, Number::Int(2));
+    }
+
+    #[test]
+    fn test_parser_caret() {
+        let source = "2^3^2";
+        let lexer = Lexer::from_source_code(source);
+        let mut parser = Parser::from_lexer(lexer);
+        let node = parser.parse();
+
+        assert!(node.is_ok());
+
+        let value = node.unwrap().evaluate();
+
+        assert_eq!(value, Number::Int(512));
     }
 }
