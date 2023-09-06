@@ -1,5 +1,9 @@
 # Changelog for `titled`
 
+## Unreleased
+
+- Changed location of both unittests and integration tests to `tests`
+
 ## Version 0.2.0
 
 - Added a command-line interface [`1629b6d9`]
