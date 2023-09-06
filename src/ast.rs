@@ -97,6 +97,72 @@ impl Display for Number {
     }
 }
 
+impl From<u8> for Number {
+    fn from(n: u8) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<u16> for Number {
+    fn from(n: u16) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<u32> for Number {
+    fn from(n: u32) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<u64> for Number {
+    fn from(n: u64) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<i8> for Number {
+    fn from(n: i8) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<i16> for Number {
+    fn from(n: i16) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<i32> for Number {
+    fn from(n: i32) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<i64> for Number {
+    fn from(n: i64) -> Self {
+        Self::Int(n as i128)
+    }
+}
+
+impl From<i128> for Number {
+    fn from(n: i128) -> Self {
+        Self::Int(n)
+    }
+}
+
+impl From<f32> for Number {
+    fn from(n: f32) -> Self {
+        Self::Flt(n as f64)
+    }
+}
+
+impl From<f64> for Number {
+    fn from(n: f64) -> Self {
+        Self::Flt(n)
+    }
+}
+
 /// [`Node`] provides a blanket trait for both [`BinaryNode`] and [`UnaryNode`].
 pub trait Node: Debug {
     /// Finds the value of this [`Node`].
