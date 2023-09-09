@@ -21,6 +21,9 @@ pub enum LexError {
     /// Character is not part of any [`Token`](crate::Token).
     UnrecognisedCharacter(char, usize),
 
+    /// Undefined function.
+    UnrecognisedFunction(String, usize),
+
     /// Errors caused by parsing valid but unexpected user input.
     InternalError(&'static str, usize),
 }
@@ -87,6 +90,9 @@ impl Display for LexError {
         match self {
             Self::UnrecognisedCharacter(c, i) => {
                 write!(f, "Unrecognised character '{}' at index {}", c, i)
+            }
+            Self::UnrecognisedFunction(n, i) => {
+                write!(f, "Unrecognised function '{}' at index {}", n, i)
             }
             Self::InternalError(e, i) => write!(f, "{} at index {}", e, i),
         }
