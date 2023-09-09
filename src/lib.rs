@@ -12,5 +12,5 @@ pub mod parser;
 pub use ast::{BinaryAction, BinaryNode, NodeBox, Number, PlainNode, UnaryAction, UnaryNode};
 pub use cli::Cli;
 pub use error::{LexError, ParseError, TilError};
-pub use lexer::{Lexer, Operator, Span, Token, TokenKind};
+pub use lexer::{Function, Lexer, Operator, Span, Token, TokenKind};
 pub use parser::Parser;

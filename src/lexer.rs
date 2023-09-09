@@ -47,11 +47,54 @@ pub enum TokenKind {
     /// Operator.
     Op(Operator),
 
+    /// Function.
+    Func(Function),
+
     /// Left parenthesis.
     LeftParen,
 
     /// Right parenthesis.
     RightParen,
+}
+
+/// Functions.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Function {
+    /// Sine.
+    Sin,
+
+    /// Cosine.
+    Cos,
+
+    /// Tangent.
+    Tan,
+
+    /// Cosecant.
+    Csc,
+
+    /// Secant.
+    Sec,
+
+    /// Cotangent.
+    Cot,
+
+    /// Inverse sine.
+    Asin,
+
+    /// Inverse cosine.
+    Acos,
+
+    /// Inverse tangent.
+    Atan,
+
+    /// Inverse cosecant.
+    Acsc,
+
+    /// Inverse secant.
+    Asec,
+
+    /// Inverse cotangent.
+    Acot,
 }
 
 /// Basic mathematical operators.
@@ -72,9 +115,6 @@ pub enum Operator {
     /// Operator `^`.
     Caret,
 }
-
-// Improve syntax clarity.
-use TokenKind::*;
 
 /// Spatial information of a [`Token`].
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -108,6 +148,27 @@ impl From<char> for Operator {
     }
 }
 
+impl TryFrom<&str> for Function {
+    type Error = ();
+    fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
+        match value {
+            "sin" => Ok(Self::Sin),
+            "cos" => Ok(Self::Cos),
+            "tan" => Ok(Self::Tan),
+            "csc" => Ok(Self::Csc),
+            "sec" => Ok(Self::Sec),
+            "cot" => Ok(Self::Cot),
+            "asin" => Ok(Self::Asin),
+            "acos" => Ok(Self::Acos),
+            "atan" => Ok(Self::Atan),
+            "acsc" => Ok(Self::Acsc),
+            "asec" => Ok(Self::Asec),
+            "acot" => Ok(Self::Acot),
+            _ => Err(()),
+        }
+    }
+}
+
 impl<Idx: SliceIndex<str>> Index<Idx> for Lexer {
     type Output = Idx::Output;
 
@@ -129,7 +190,7 @@ impl Iterator for Lexer {
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.lex() {
-            Ok(token) if token.kind != Eof => Some(token),
+            Ok(token) if token.kind != TokenKind::Eof => Some(token),
             _ => None,
         }
     }
@@ -181,14 +242,17 @@ impl Lexer {
             // These are short so they are handled in-place.
             '(' => {
                 self.current_index += 1;
-                Ok(token!(LeftParen, self.current_index - 1, 1))
+                Ok(token!(TokenKind::LeftParen, self.current_index - 1, 1))
             }
             ')' => {
                 self.current_index += 1;
-                Ok(token!(RightParen, self.current_index - 1, 1))
+                Ok(token!(TokenKind::RightParen, self.current_index - 1, 1))
             }
 
-            // Any other characters
+            // Functions.
+            c if c.is_ascii_alphabetic() => self.handle_function(),
+
+            // Any other characters.
             c => Err(LexError::UnrecognisedCharacter(c, self.current_index)),
         }
     }
@@ -236,14 +300,14 @@ impl Lexer {
                 .parse::<f64>()
                 .map_err(|_| LexError::InternalError("Parse float failed", self.current_index))?;
 
-            Ok(token!(Flt(num), original_index, result.len()))
+            Ok(token!(TokenKind::Flt(num), original_index, result.len()))
         } else {
             // Integer
             let num = result
                 .parse::<u64>()
                 .map_err(|_| LexError::InternalError("Parse integer failed", self.current_index))?;
 
-            Ok(token!(Int(num), original_index, result.len()))
+            Ok(token!(TokenKind::Int(num), original_index, result.len()))
         }
     }
 
@@ -264,13 +328,35 @@ impl Lexer {
         match op {
             '+' | '-' | '*' | '/' | '^' => {
                 self.current_index += 1;
-                Ok(token!(Op(op.into()), self.current_index - 1, 1))
+                Ok(token!(TokenKind::Op(op.into()), self.current_index - 1, 1))
             }
             _ => Err(LexError::InternalError(
                 "Invalid operator inside operator handler",
                 self.current_index,
             )),
         }
+    }
+
+    pub fn handle_function(&mut self) -> Result<Token> {
+        // Keep track of the original index for later.
+        let original_index = self.current_index;
+
+        // Trigos only contain letters.
+        let name = self.source_code[self.current_index..]
+            .chars()
+            .take_while(|c| c.is_ascii_alphabetic())
+            .collect::<String>();
+
+        // Convert string to trigonometric function.
+        let trigo = name
+            .as_str()
+            .try_into()
+            .map_err(|_| LexError::UnrecognisedFunction(name.clone(), self.current_index))?;
+
+        // Update current index.
+        self.current_index += name.len();
+
+        Ok(token!(TokenKind::Func(trigo), original_index, name.len()))
     }
 
     /// Reverts this [`Lexer`] to its original state.
