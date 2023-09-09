@@ -1,4 +1,4 @@
-use tilted::{Lexer, Operator::*, TokenKind::*};
+use tilted::{Function::*, Lexer, Operator::*, TokenKind::*};
 
 macro_rules! make_lexer_test {
     ($name: ident, $source: literal, [$($token_kind: expr,)*]) => {
@@ -74,6 +74,18 @@ make_lexer_test!(
         Int(2),
         Eof,
     ]
+);
+
+make_lexer_test!(
+    test_lexer_trigo,
+    "sin cos tan",
+    [Func(Sin), Func(Cos), Func(Tan), Eof,]
+);
+
+make_lexer_test!(
+    test_lexer_trigo_with_expr,
+    "sin(3.14)",
+    [Func(Sin), LeftParen, Flt(3.14), RightParen, Eof,]
 );
 
 make_lexer_test!(E: test_lexer_too_many_decimals, "9.0.0");
