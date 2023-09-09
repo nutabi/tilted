@@ -287,84 +287,60 @@ impl UnaryAction {
 
     fn evaluate_function(func: &Function, operand: Number) -> Number {
         match func {
-            Function::Sin => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).sin()),
-                    Number::Flt(n) => return Number::Flt(n.sin()),
-                }
+            Function::Sin => match operand {
+                Number::Int(n) => Number::Flt((n as f64).sin()),
+                Number::Flt(n) => Number::Flt(n.sin()),
             },
-            Function::Cos => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).cos()),
-                    Number::Flt(n) => return Number::Flt(n.cos()),
-                }
+            Function::Cos => match operand {
+                Number::Int(n) => Number::Flt((n as f64).cos()),
+                Number::Flt(n) => Number::Flt(n.cos()),
             },
-            Function::Tan => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).tan()),
-                    Number::Flt(n) => return Number::Flt(n.tan()),
-                }
+            Function::Tan => match operand {
+                Number::Int(n) => Number::Flt((n as f64).tan()),
+                Number::Flt(n) => Number::Flt(n.tan()),
             },
-            Function::Sec => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).cos().recip()),
-                    Number::Flt(n) => return Number::Flt(n.cos().recip()),
-                }
+            Function::Sec => match operand {
+                Number::Int(n) => Number::Flt((n as f64).cos().recip()),
+                Number::Flt(n) => Number::Flt(n.cos().recip()),
             },
-            Function::Csc => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).sin().recip()),
-                    Number::Flt(n) => return Number::Flt(n.sin().recip()),
-                }
+            Function::Csc => match operand {
+                Number::Int(n) => Number::Flt((n as f64).sin().recip()),
+                Number::Flt(n) => Number::Flt(n.sin().recip()),
             },
 
-            Function::Cot => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).tan().recip()),
-                    Number::Flt(n) => return Number::Flt(n.tan().recip()),
-                }
-            },
-            
-            Function::Asin => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).asin()),
-                    Number::Flt(n) => return Number::Flt(n.asin()),
-                }
+            Function::Cot => match operand {
+                Number::Int(n) => Number::Flt((n as f64).tan().recip()),
+                Number::Flt(n) => Number::Flt(n.tan().recip()),
             },
 
-            Function::Acos => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).acos()),
-                    Number::Flt(n) => return Number::Flt(n.acos()),
-                }
+            Function::Asin => match operand {
+                Number::Int(n) => Number::Flt((n as f64).asin()),
+                Number::Flt(n) => Number::Flt(n.asin()),
             },
 
-            Function::Atan => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).atan()),
-                    Number::Flt(n) => return Number::Flt(n.atan()),
-                }
+            Function::Acos => match operand {
+                Number::Int(n) => Number::Flt((n as f64).acos()),
+                Number::Flt(n) => Number::Flt(n.acos()),
             },
 
-            Function::Asec => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).recip().acos()),
-                    Number::Flt(n) => return Number::Flt(n.recip().acos()),
-                }
+            Function::Atan => match operand {
+                Number::Int(n) => Number::Flt((n as f64).atan()),
+                Number::Flt(n) => Number::Flt(n.atan()),
             },
 
-            Function::Acsc => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).recip().asin()),
-                    Number::Flt(n) => return Number::Flt(n.recip().asin()),
-                }
+            Function::Asec => match operand {
+                Number::Int(n) => Number::Flt((n as f64).recip().acos()),
+                Number::Flt(n) => Number::Flt(n.recip().acos()),
             },
 
-            Function::Acot => {
-                match operand {
-                    Number::Int(n) => return Number::Flt((n as f64).recip().atan()),
-                    Number::Flt(n) => return Number::Flt(n.recip().atan()),
-                }
+            Function::Acsc => match operand {
+                Number::Int(n) => Number::Flt((n as f64).recip().asin()),
+                Number::Flt(n) => Number::Flt(n.recip().asin()),
+            },
+
+            Function::Acot => match operand {
+                Number::Int(n) => Number::Flt((n as f64).recip().atan()),
+                Number::Flt(n) => Number::Flt(n.recip().atan()),
             },
         }
     }
