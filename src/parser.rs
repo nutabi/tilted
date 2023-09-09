@@ -79,31 +79,24 @@ impl Parser {
 
         // Loop to get all factors.
         loop {
-            // Get the operator.
-            let operator = match self.current_token.kind {
-                TokenKind::Op(op) => op,
+            // Get the actor.
+            let actor = match self.current_token.kind {
+                TokenKind::Op(op) => match op {
+                    Operator::Star => BinaryAction::Mul,
+                    Operator::Slash => BinaryAction::Div,
+                    _ => return Ok(factor),
+                },
 
-                // Check for implicit multiplication (left parenthesis)
-                TokenKind::LeftParen => {
-                    let expr = self.parse_paren_expr()?;
-                    let actor = BinaryAction::Mul;
-                    factor = Box::new(BinaryNode::new(factor, actor, expr));
-
-                    continue;
-                }
+                // Check for implicit multiplication (left parenthesis).
+                TokenKind::LeftParen => BinaryAction::Mul,
 
                 _ => return Ok(factor),
             };
 
-            // Match operator to actor.
-            let actor = match operator {
-                Operator::Star => BinaryAction::Mul,
-                Operator::Slash => BinaryAction::Div,
-                _ => return Ok(factor),
-            };
-
-            // Consume operator.
-            self.lex_and_store()?;
+            // Consume operator if it isn't implicit multiplication.
+            if self.current_token.kind != TokenKind::LeftParen {
+                self.lex_and_store()?;
+            }
 
             // Get the next factor.
             let next_factor = self.parse_factor()?;
