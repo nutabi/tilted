@@ -1,3 +1,5 @@
+#![cfg(feature = "cli")]
+
 use std::process::exit;
 
 use tilted::{self, Cli};

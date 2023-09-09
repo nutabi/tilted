@@ -10,8 +10,12 @@ readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "tilted"
+required-features = ["cli"]
+
 [features]
-default = ["cli"]
+default = ["serde", "cli"]
 cli = ["dep:argh"]
 serde = ["dep:serde"]
 
