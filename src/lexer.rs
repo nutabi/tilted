@@ -5,6 +5,9 @@
 
 use std::{fmt::Display, ops::Index, slice::SliceIndex};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{eof, token, LexError};
 
 /// Special [`Result`] type for the lexer.
@@ -12,6 +15,7 @@ type Result<T> = std::result::Result<T, LexError>;
 
 /// Lexer for [`tilted`](crate). It parses user input and return [`Token`]s.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Lexer {
     /// The original source code that is passed in.
     source_code: Box<str>,
@@ -22,6 +26,7 @@ pub struct Lexer {
 
 /// Part of the source code tokenised. Returned by a [`Lexer`].
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Token {
     /// Type of this [`Token`].
     pub kind: TokenKind,
@@ -32,6 +37,7 @@ pub struct Token {
 
 /// Type of a [`Token`], also containing the information associated.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum TokenKind {
     /// End-of-file token. Note that the [`Span`] associated with EOF is
     /// out-of-bound, meaning if the span is used to look up source code, the
@@ -59,6 +65,7 @@ pub enum TokenKind {
 
 /// Functions.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Function {
     /// Sine.
     Sin,
@@ -99,6 +106,7 @@ pub enum Function {
 
 /// Basic mathematical operators.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Operator {
     /// Operator `+`.
     Plus,
@@ -118,6 +126,7 @@ pub enum Operator {
 
 /// Spatial information of a [`Token`].
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Span {
     /// Index of the first character of this [`Span`].
     pub start_index: usize,
