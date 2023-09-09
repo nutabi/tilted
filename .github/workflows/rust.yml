@@ -1,4 +1,4 @@
-name: rust-check
+name: minimal-rust-check
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Run rust-clippy analyzing
+    name: Minimal Rust check
 
     runs-on: ubuntu-latest
 
