@@ -7,15 +7,86 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::Function;
 
 /// Internal representation of numbers.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Number {
     Int(i128),
     Flt(f64),
 }
 
+/// [`Node`] provides a blanket trait for both [`BinaryNode`] and [`UnaryNode`].
+#[cfg_attr(feature = "serde", typetag::serde(tag = "type"))]
+pub trait Node: Debug {
+    /// Finds the value of this [`Node`].
+    fn evaluate(&self) -> Number;
+}
+
+/// Convenience type aliase for a [`Node`] stored on the heap.
+pub type NodeBox = Box<dyn Node>;
+
+/// [`BinaryAction`] is an action done by a [`Node`] using two operands.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum BinaryAction {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Pow,
+}
+
+/// [`BinaryNode`] is a [`Node`] that performs an action on two operands.
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct BinaryNode {
+    /// Left-hand side operand (if any) of this [`BinaryNode`].
+    left: NodeBox,
+
+    /// Action to be performed by this [`BinaryNode`].
+    actor: BinaryAction,
+
+    /// Right-hand side operand of this [`BinaryNode`].
+    right: NodeBox,
+}
+
+/// [`BinaryAction`] is an action done by a [`Node`] using one operand.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum UnaryAction {
+    Neg,
+    Iden,
+    Func(Function),
+}
+
+/// [`BinaryNode`] is a [`Node`] that performs an action on one operand.
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct UnaryNode {
+    /// Action to be performed by this [`UnaryNode`].
+    actor: UnaryAction,
+
+    /// The sole operand of this [`UnaryNode`].
+    operand: NodeBox,
+}
+
+/// [`PlainNode`] simply stores the numbers without any action.
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct PlainNode(Number);
+
+// -----------------------------------------------------------------------------
+// All impls onwards.
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// 1. impls for Number.
+// -----------------------------------------------------------------------------
 impl PartialEq for Number {
     fn eq(&self, other: &Self) -> bool {
         // Integer comparison.
@@ -223,59 +294,9 @@ impl From<f64> for Number {
     }
 }
 
-/// [`Node`] provides a blanket trait for both [`BinaryNode`] and [`UnaryNode`].
-pub trait Node: Debug {
-    /// Finds the value of this [`Node`].
-    fn evaluate(&self) -> Number;
-}
-
-/// Convenience type aliase for a [`Node`] stored on the heap.
-pub type NodeBox = Box<dyn Node>;
-
-/// [`BinaryAction`] is an action done by a [`Node`] using two operands.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum BinaryAction {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Pow,
-}
-
-/// [`BinaryNode`] is a [`Node`] that performs an action on two operands.
-#[derive(Debug)]
-pub struct BinaryNode {
-    /// Left-hand side operand (if any) of this [`BinaryNode`].
-    left: NodeBox,
-
-    /// Action to be performed by this [`BinaryNode`].
-    actor: BinaryAction,
-
-    /// Right-hand side operand of this [`BinaryNode`].
-    right: NodeBox,
-}
-
-/// [`BinaryAction`] is an action done by a [`Node`] using one operand.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum UnaryAction {
-    Neg,
-    Iden,
-    Func(Function),
-}
-
-/// [`BinaryNode`] is a [`Node`] that performs an action on one operand.
-#[derive(Debug)]
-pub struct UnaryNode {
-    /// Action to be performed by this [`UnaryNode`].
-    actor: UnaryAction,
-
-    /// The sole operand of this [`UnaryNode`].
-    operand: NodeBox,
-}
-
-/// [`PlainNode`] simply stores the numbers without any action.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct PlainNode(Number);
+// -----------------------------------------------------------------------------
+// 2. impls for BinaryAction.
+// -----------------------------------------------------------------------------
 
 impl BinaryAction {
     pub fn evaluate(&self, left: Number, right: Number) -> Number {
@@ -311,6 +332,11 @@ impl BinaryAction {
     }
 }
 
+// -----------------------------------------------------------------------------
+// 3. impls for BinaryNode.
+// -----------------------------------------------------------------------------
+
+#[cfg_attr(feature = "serde", typetag::serde)]
 impl Node for BinaryNode {
     fn evaluate(&self) -> Number {
         // Evaluate both sub-nodes.
@@ -333,6 +359,10 @@ impl BinaryNode {
         Self { left, actor, right }
     }
 }
+
+// -----------------------------------------------------------------------------
+// 4. impls for UnaryAction.
+// -----------------------------------------------------------------------------
 
 impl UnaryAction {
     pub fn evaluate(&self, operand: Number) -> Number {
@@ -404,6 +434,11 @@ impl UnaryAction {
     }
 }
 
+// -----------------------------------------------------------------------------
+// 5. impls for UnaryNode.
+// -----------------------------------------------------------------------------
+
+#[cfg_attr(feature = "serde", typetag::serde)]
 impl Node for UnaryNode {
     fn evaluate(&self) -> Number {
         // Evaluate the operand.
@@ -421,6 +456,11 @@ impl UnaryNode {
     }
 }
 
+// -----------------------------------------------------------------------------
+// 6. impls for PlainNode.
+// -----------------------------------------------------------------------------
+
+#[cfg_attr(feature = "serde", typetag::serde)]
 impl Node for PlainNode {
     fn evaluate(&self) -> Number {
         self.0
