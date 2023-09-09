@@ -3,6 +3,7 @@ use tilted::{Function::*, Lexer, Operator::*, TokenKind::*};
 macro_rules! make_lexer_test {
     ($name: ident, $source: literal, [$($token_kind: expr,)*]) => {
         #[test]
+        #[allow(clippy::approx_constant)]
         fn $name() {
             let mut lexer = Lexer::from_source_code($source);
             $(
