@@ -30,3 +30,4 @@ make_parser_test!(test_parser_unary_op_expr, "-5 + 5", 0);
 make_parser_test!(test_parser_impl_mul, "5(5)", 25);
 make_parser_test!(test_parser_impl_mul_expr, "5(5 + 5)", 50);
 make_parser_test!(test_parser_complex_expr, "2*-(3*(1+-(2)))^2", -18);
+make_parser_test!(test_parser_impl_mul_func, "5sin(0)", 0.0);
