@@ -2,14 +2,11 @@
 
 ## Unreleased
 
-- Added support for (trigonometric) functions [`09b0a5cb`]
+- Added support for (trigonometric) functions
 
-- Improved clarity of both tokenisation and production rules [`f68beea7`]
+- Improved clarity of both tokenisation and production rules
 
 - Changed location of both unittests and integration tests to `tests`
-
-[`09b0a5cb`]: https://github.com/SaltedPeanutButter/cal/commit/09b0a5cb3dea2808a67ff0fb6537dfe852fa41cc
-[`f68beea7`]: https://github.com/SaltedPeanutButter/cal/commit/f68beea7f1d14306594cb2b3b8e7555bb45d118f
 
 ## Version 0.2.0
 
