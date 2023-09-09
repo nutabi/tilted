@@ -174,11 +174,11 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// atomic = Int | Flt | Func? LeftParen expr RightParen
+    /// atomic = Int | Flt | paren_expr | Func paren_expr
     /// ```
     fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
-        let node = match self.current_token.kind {
+        let node: NodeBox = match self.current_token.kind {
             // Numbers (parse_numbers is merged here).
             TokenKind::Flt(f) => Box::new(PlainNode::new(Number::Flt(f))),
             TokenKind::Int(i) => Box::new(PlainNode::new(Number::Int(i as i128))),
@@ -186,6 +186,18 @@ impl Parser {
             // Parenthesised expressions.
             // Return immediately to avoid consumption of current token.
             TokenKind::LeftParen => return self.parse_paren_expr(),
+
+            // Functions.
+            TokenKind::Func(func) => {
+                // Consume function.
+                self.lex_and_store()?;
+
+                // Parse parenthesised expression.
+                let expr = self.parse_paren_expr()?;
+
+                // Create a new node.
+                Box::new(UnaryNode::new(UnaryAction::Func(func), expr))
+            }
 
             // Invalid unary operators, valid ones were handled up top.
             TokenKind::Op(_) => {
@@ -212,7 +224,7 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// paren_expr = ( expr )
+    /// paren_expr = LeftParen expr RightParen
     /// ```
     fn parse_paren_expr(&mut self) -> Result<NodeBox> {
         // Expect a left parenthesis.
