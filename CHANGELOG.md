@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added interactive mode and printing of AST nodes to CLI
+
 - Added support for (trigonometric) functions
 
 - Added a new feature `serde` that supports serialisation and deserialisation with `serde`
