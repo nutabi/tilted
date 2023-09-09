@@ -1,4 +1,4 @@
-# Changelog for `titled`
+# Changelog for `tilted`
 
 ## Unreleased
 
