@@ -158,7 +158,7 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// pow = atomic (^ expr)?
+    /// pow = atomic (^ atomic)?
     /// ```
     fn parse_pow(&mut self) -> Result<NodeBox> {
         // Parse base.
@@ -173,7 +173,7 @@ impl Parser {
         self.lex_and_store()?;
 
         // Parse exponent.
-        let exponent = self.parse_expr()?;
+        let exponent = self.parse_atomic()?;
 
         // Create a new node.
         Ok(Box::new(BinaryNode::new(base, BinaryAction::Pow, exponent)))
