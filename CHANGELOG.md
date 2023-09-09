@@ -4,6 +4,10 @@
 
 - Added support for (trigonometric) functions
 
+- Added a new feature `serde` that supports serialisation and deserialisation with `serde`
+
+- Added support to convert `Node` to a human-readable tree
+
 - Improved clarity of both tokenisation and production rules
 
 - Changed location of both unittests and integration tests to `tests`
