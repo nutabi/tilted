@@ -1,7 +1,8 @@
 //! This module implements the command-line interface for [`tilted`](crate).
-use argh::FromArgs;
+#![cfg(feature = "cli")]
 
 use crate::{Lexer, Parser};
+use argh::FromArgs;
 
 /// A non-Turing-complete interpreted programming 'language' that can do maths
 /// (only).
