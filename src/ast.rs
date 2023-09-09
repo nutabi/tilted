@@ -22,9 +22,11 @@ pub enum Number {
 
 /// [`Node`] provides a blanket trait for both [`BinaryNode`] and [`UnaryNode`].
 #[cfg_attr(feature = "serde", typetag::serde(tag = "type"))]
-pub trait Node: Debug {
+pub trait Node: Debug + Display {
     /// Finds the value of this [`Node`].
     fn evaluate(&self) -> Number;
+
+    fn to_tree(&self) -> Vec<String>;
 }
 
 /// Convenience type alias for a [`Node`] stored on the heap.
@@ -332,6 +334,20 @@ impl BinaryAction {
     }
 }
 
+impl Display for BinaryAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Op(")?;
+        match self {
+            Self::Add => write!(f, "+"),
+            Self::Sub => write!(f, "-"),
+            Self::Mul => write!(f, "*"),
+            Self::Div => write!(f, "/"),
+            Self::Pow => write!(f, "^"),
+        }?;
+        write!(f, ")")
+    }
+}
+
 // -----------------------------------------------------------------------------
 // 3. impls for BinaryNode.
 // -----------------------------------------------------------------------------
@@ -345,6 +361,38 @@ impl Node for BinaryNode {
 
         // Then evalute this node.
         self.actor.evaluate(left, right)
+    }
+
+    fn to_tree(&self) -> Vec<String> {
+        // Get actor.
+        let actor = self.actor.to_string();
+
+        // Process left side.
+        let mut left_tree = self.left.to_tree();
+        (&mut left_tree[0]).insert_str(0, "`-- ");
+        for line in left_tree.iter_mut().skip(1) {
+            line.insert_str(0, "|   ");
+        }
+
+        // Process right side.
+        let mut right_tree = self.right.to_tree();
+        (&mut right_tree[0]).insert_str(0, "`-- ");
+        for line in right_tree.iter_mut().skip(1) {
+            line.insert_str(0, "    ");
+        }
+
+        // Combine all three.
+        let mut tree = vec![actor];
+        tree.extend(left_tree);
+        tree.extend(right_tree);
+
+        tree
+    }
+}
+
+impl Display for BinaryNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_tree().join("\n"))
     }
 }
 
@@ -434,6 +482,16 @@ impl UnaryAction {
     }
 }
 
+impl Display for UnaryAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Neg => write!(f, "Op(-)"),
+            Self::Iden => write!(f, "Op(+)"),
+            Self::Func(func) => write!(f, "Func({})", func),
+        }
+    }
+}
+
 // -----------------------------------------------------------------------------
 // 5. impls for UnaryNode.
 // -----------------------------------------------------------------------------
@@ -446,6 +504,29 @@ impl Node for UnaryNode {
 
         // Then evaluate this node.
         self.actor.evaluate(operand)
+    }
+
+    fn to_tree(&self) -> Vec<String> {
+        // Get actor.
+        let actor = self.actor.to_string();
+
+        // Process left side.
+        let mut left_tree = self.operand.to_tree();
+        (&mut left_tree[0]).insert_str(0, "`-- ");
+        for line in left_tree.iter_mut().skip(1) {
+            line.insert_str(0, &"|   ");
+        }
+
+        // Combine.
+        left_tree.insert(0, actor);
+
+        left_tree
+    }
+}
+
+impl Display for UnaryNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_tree().join("\n"))
     }
 }
 
@@ -464,6 +545,16 @@ impl UnaryNode {
 impl Node for PlainNode {
     fn evaluate(&self) -> Number {
         self.0
+    }
+
+    fn to_tree(&self) -> Vec<String> {
+        vec![self.0.to_string()]
+    }
+}
+
+impl Display for PlainNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_tree().join("\n"))
     }
 }
 

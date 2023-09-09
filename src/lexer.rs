@@ -178,6 +178,25 @@ impl TryFrom<&str> for Function {
     }
 }
 
+impl Display for Function {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Function::Sin => write!(f, "Sin"),
+            Function::Cos => write!(f, "Cos"),
+            Function::Tan => write!(f, "Tan"),
+            Function::Csc => write!(f, "Csc"),
+            Function::Sec => write!(f, "Sec"),
+            Function::Cot => write!(f, "Cot"),
+            Function::Asin => write!(f, "Asin"),
+            Function::Acos => write!(f, "Acos"),
+            Function::Atan => write!(f, "Atan"),
+            Function::Acsc => write!(f, "Acsc"),
+            Function::Asec => write!(f, "Asec"),
+            Function::Acot => write!(f, "Acot"),
+        }
+    }
+}
+
 impl<Idx: SliceIndex<str>> Index<Idx> for Lexer {
     type Output = Idx::Output;
 
