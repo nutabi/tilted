@@ -26,7 +26,7 @@ impl PartialEq for Number {
         }
 
         // Floating point comparison.
-        let epsilon = f64::EPSILON;
+        let epsilon = f64::EPSILON * 1e3;
         let a = match self {
             Self::Int(n) => *n as f64,
             Self::Flt(n) => *n,
@@ -50,7 +50,7 @@ impl PartialOrd for Number {
         }
 
         // Floating point comparison.
-        let epsilon = f64::EPSILON;
+        let epsilon = f64::EPSILON * 1e3;
         let a = match self {
             Self::Int(n) => *n as f64,
             Self::Flt(n) => *n,
@@ -61,9 +61,7 @@ impl PartialOrd for Number {
         };
 
         a.partial_cmp(&b).map(|o| {
-            if o == std::cmp::Ordering::Equal {
-                std::cmp::Ordering::Equal
-            } else if (a - b).abs() < epsilon {
+            if o == std::cmp::Ordering::Equal || (a - b).abs() < epsilon {
                 std::cmp::Ordering::Equal
             } else {
                 o
