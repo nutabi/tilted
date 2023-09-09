@@ -369,14 +369,14 @@ impl Node for BinaryNode {
 
         // Process left side.
         let mut left_tree = self.left.to_tree();
-        (&mut left_tree[0]).insert_str(0, "`-- ");
+        left_tree[0].insert_str(0, "`-- ");
         for line in left_tree.iter_mut().skip(1) {
             line.insert_str(0, "|   ");
         }
 
         // Process right side.
         let mut right_tree = self.right.to_tree();
-        (&mut right_tree[0]).insert_str(0, "`-- ");
+        right_tree[0].insert_str(0, "`-- ");
         for line in right_tree.iter_mut().skip(1) {
             line.insert_str(0, "    ");
         }
@@ -512,9 +512,9 @@ impl Node for UnaryNode {
 
         // Process left side.
         let mut left_tree = self.operand.to_tree();
-        (&mut left_tree[0]).insert_str(0, "`-- ");
+        left_tree[0].insert_str(0, "`-- ");
         for line in left_tree.iter_mut().skip(1) {
-            line.insert_str(0, &"|   ");
+            line.insert_str(0, "|   ");
         }
 
         // Combine.
