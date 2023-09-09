@@ -8,6 +8,8 @@
 
 - Changed location of both unittests and integration tests to `tests`
 
+- Fixed an error that caused implicit multiplication to be parsed incorrectly
+
 ## Version 0.2.0
 
 - Added a command-line interface [`1629b6d9`]
