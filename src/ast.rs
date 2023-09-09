@@ -10,10 +10,66 @@ use std::{
 use crate::Function;
 
 /// Internal representation of numbers.
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy)]
 pub enum Number {
     Int(i128),
     Flt(f64),
+}
+
+impl PartialEq for Number {
+    fn eq(&self, other: &Self) -> bool {
+        // Integer comparison.
+        if let Self::Int(a) = self {
+            if let Self::Int(b) = other {
+                return a == b;
+            }
+        }
+
+        // Floating point comparison.
+        let epsilon = f64::EPSILON;
+        let a = match self {
+            Self::Int(n) => *n as f64,
+            Self::Flt(n) => *n,
+        };
+        let b = match other {
+            Self::Int(n) => *n as f64,
+            Self::Flt(n) => *n,
+        };
+
+        (a - b).abs() < epsilon
+    }
+}
+
+impl PartialOrd for Number {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        // Integer comparison.
+        if let Self::Int(a) = self {
+            if let Self::Int(b) = other {
+                return a.partial_cmp(b);
+            }
+        }
+
+        // Floating point comparison.
+        let epsilon = f64::EPSILON;
+        let a = match self {
+            Self::Int(n) => *n as f64,
+            Self::Flt(n) => *n,
+        };
+        let b = match other {
+            Self::Int(n) => *n as f64,
+            Self::Flt(n) => *n,
+        };
+
+        a.partial_cmp(&b).map(|o| {
+            if o == std::cmp::Ordering::Equal {
+                std::cmp::Ordering::Equal
+            } else if (a - b).abs() < epsilon {
+                std::cmp::Ordering::Equal
+            } else {
+                o
+            }
+        })
+    }
 }
 
 impl Add for Number {
@@ -67,6 +123,10 @@ impl Mul for Number {
 impl Div for Number {
     type Output = Self;
     fn div(self, rhs: Self) -> Self::Output {
+        if rhs == Self::Int(0) || rhs == Self::Flt(0.0) {
+            return Self::Flt(f64::NAN);
+        }
+
         match self {
             Self::Int(a) => match rhs {
                 Self::Int(b) => Self::Int(a / b),
