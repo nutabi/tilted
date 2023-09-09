@@ -1,0 +1,10 @@
+pg          :=  expr
+expr        :=  term ([+-] term)*
+term        :=  factor ([*/]? factor)*
+factor      :=  [+-]? pow
+pow         :=  atomic (^ atomic)*
+atomic      :=  Int
+            |   Flt
+            |   paren_expr
+            |   Func paren_expr
+paren_expr  :=  LeftParen expr RightParen
