@@ -5,34 +5,29 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  schedule:
-    - cron: '28 13 * * 4'
 
 jobs:
-  rust-clippy-analyze:
+  build:
     name: Run rust-clippy analyzing
+
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: clippy
-          override: true
+      - name: Build project
+        run: cargo build --all-features --verbose
+        continue-on-error: false
+
+      - name: Run tests
+        run: cargo test --all-targets --verbose
+        continue-on-error: false
 
       - name: Check code formatting
-        run: cargo fmt --all --check --quiet
+        run: cargo fmt --all --check --verbose
         continue-on-error: false
 
       - name: Check code linting
-        run:
-          cargo clippy --all-features -- -D warnings
+        run: cargo clippy --all-features --verbose -- -D warnings
         continue-on-error: false
