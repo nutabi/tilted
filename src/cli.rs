@@ -1,9 +1,9 @@
 //! This module implements the command-line interface for [`tilted`](crate).
 #![cfg(feature = "cli")]
 
-use std::io::Write;
 use crate::{Lexer, Parser};
 use argh::FromArgs;
+use std::io::Write;
 
 /// A non-Turing-complete interpreted programming 'language' that can do maths
 /// (only).
