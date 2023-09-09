@@ -174,7 +174,7 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// atomic = Int | Flt | paren_expr
+    /// atomic = Int | Flt | Func? LeftParen expr RightParen
     /// ```
     fn parse_atomic(&mut self) -> Result<NodeBox> {
         // Match the next token.
@@ -192,6 +192,7 @@ impl Parser {
                 return Err(ParseError::InvalidUnaryOperator(self.current_token).into())
             }
 
+            // Catch all EOF.
             TokenKind::Eof => return Err(ParseError::UnexpectedEOF.into()),
 
             // Invalid:
@@ -204,9 +205,7 @@ impl Parser {
         };
 
         // Consume token.
-        if self.current_token.kind != TokenKind::LeftParen {
-            self.lex_and_store()?;
-        }
+        self.lex_and_store()?;
 
         Ok(node)
     }
