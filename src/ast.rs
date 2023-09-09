@@ -27,7 +27,7 @@ pub trait Node: Debug {
     fn evaluate(&self) -> Number;
 }
 
-/// Convenience type aliase for a [`Node`] stored on the heap.
+/// Convenience type alias for a [`Node`] stored on the heap.
 pub type NodeBox = Box<dyn Node>;
 
 /// [`BinaryAction`] is an action done by a [`Node`] using two operands.
