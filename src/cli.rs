@@ -8,6 +8,10 @@ use argh::FromArgs;
 /// (only).
 #[derive(Debug, FromArgs)]
 pub struct Cli {
+    /// print the AST
+    #[argh(switch, short = 'p')]
+    ast: bool,
+
     /// user input
     #[argh(positional)]
     input: String,
@@ -21,7 +25,11 @@ impl Cli {
 
         match result {
             Ok(node) => {
+                if self.ast {
+                    println!("{}", node);
+                } else {
                 println!("{}", node.evaluate());
+                }
                 0
             }
             Err(e) => {
