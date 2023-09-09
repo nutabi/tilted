@@ -71,7 +71,7 @@ impl Parser {
 
     /// Production:
     /// ```text
-    /// term = factor ([*/]? factor)*
+    /// term = factor ([*/] factor)*
     /// ```
     fn parse_term(&mut self) -> Result<NodeBox> {
         // Get the first factor.
@@ -81,22 +81,27 @@ impl Parser {
         loop {
             // Get the actor.
             let actor = match self.current_token.kind {
-                TokenKind::Op(op) => match op {
-                    Operator::Star => BinaryAction::Mul,
-                    Operator::Slash => BinaryAction::Div,
-                    _ => return Ok(factor),
-                },
+                TokenKind::Op(op) => {
+                    let a = match op {
+                        Operator::Star => BinaryAction::Mul,
+                        Operator::Slash => BinaryAction::Div,
+                        _ => return Ok(factor),
+                    };
 
-                // Check for implicit multiplication (left parenthesis).
+                    // Consume operator.
+                    self.lex_and_store()?;
+
+                    a
+                }
+
+                // Check for implicit multiplication.
+                // 1. Left parenthesis.
                 TokenKind::LeftParen => BinaryAction::Mul,
+                // 2. Function.
+                TokenKind::Func(_) => BinaryAction::Mul,
 
                 _ => return Ok(factor),
             };
-
-            // Consume operator if it isn't implicit multiplication.
-            if self.current_token.kind != TokenKind::LeftParen {
-                self.lex_and_store()?;
-            }
 
             // Get the next factor.
             let next_factor = self.parse_factor()?;
