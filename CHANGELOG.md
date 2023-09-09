@@ -10,6 +10,8 @@
 
 - Fixed an error that caused implicit multiplication to be parsed incorrectly
 
+- Fixed an error that caused floating-point number calculation and comparison to be invalid
+
 ## Version 0.2.0
 
 - Added a command-line interface [`1629b6d9`]
