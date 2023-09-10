@@ -1,5 +1,6 @@
 [package]
 name = "tilted"
+authors = ["Nguyen Thai Binh <binhnt.dev@icloud.com>"]
 version = "0.4.0-beta.2"
 edition = "2021"
 description = "A toy mathematical interpreter written in Rust."
