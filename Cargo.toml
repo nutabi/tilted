@@ -2,7 +2,7 @@
 name = "tilted"
 version = "0.4.0-beta.2"
 edition = "2021"
-description = "A non-Turing-complete interpreted programming 'language' that can do maths (only)."
+description = "A toy mathematical interpreter written in Rust."
 license = "MIT"
 homepage = "https://github.com/SaltedPeanutButter/tilted"
 repository = "https://github.com/SaltedPeanutButter/tilted"
