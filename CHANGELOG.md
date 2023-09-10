@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Switched from `argh` to `clap` for CLI
+- Switched from `argh` to `clap` for CLI [`dcebf73f`]
+
+[`dcebf73f`]: https://github.com/SaltedPeanutButter/cal/commit/dcebf73f7e67066553459f0c592709738be7e4ea
 
 ## Version 0.3.0
 
