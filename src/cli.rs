@@ -13,8 +13,8 @@ pub struct Cli {
     #[argh(switch, short = 'p')]
     ast: bool,
 
-    /// enable interactive mode
-    #[argh(switch, short = 'i', long = "idle")]
+    /// enable interactive (read-eval-print-loop) mode
+    #[argh(switch, short = 'r', long = "repl")]
     interactive: bool,
 
     /// user input
