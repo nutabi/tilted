@@ -2,60 +2,64 @@
 #![cfg(feature = "cli")]
 
 use crate::{Lexer, Parser};
-use argh::FromArgs;
 use std::io::Write;
 
-/// A non-Turing-complete interpreted programming 'language' that can do maths
-/// (only).
-#[derive(Debug, FromArgs)]
-pub struct Cli {
-    /// print the AST
-    #[argh(switch, short = 'p')]
+use clap::Parser as ClapParser;
+
+#[derive(Debug, ClapParser)]
+#[command(author, version, about, long_about = None)]
+pub struct CliParser {
+    /// print the AST instead of the result
+    #[arg(short = 'p', long)]
     ast: bool,
 
     /// enable interactive (read-eval-print-loop) mode
-    #[argh(switch, short = 'r', long = "repl")]
+    #[arg(short = 'r', long = "repl")]
     interactive: bool,
 
     /// user input
-    #[argh(positional)]
     input: Option<String>,
 }
 
-impl Cli {
+impl CliParser {
+    pub fn parse() -> Self {
+        ClapParser::parse()
+    }
+
     pub fn start(&self) -> u8 {
+        // Check if the user wants to start the interactive mode.
         if self.interactive {
-            return self.start_interactive();
+            self.start_interative()
         }
+        // Check if the user provided any input.
+        else if let Some(ref input) = self.input {
+            let lexer = Lexer::from_source_code(input);
+            let mut parser = Parser::from_lexer(lexer);
+            let result = parser.parse();
 
-        let lexer = match self.input {
-            Some(ref input) => Lexer::from_source_code(input),
-            None => {
-                eprintln!("No input provided");
-                return 1;
-            }
-        };
-
-        let mut parser = Parser::from_lexer(lexer);
-        let result = parser.parse();
-
-        match result {
-            Ok(node) => {
-                if self.ast {
-                    println!("{}", node);
-                } else {
-                    println!("{}", node.evaluate());
+            match result {
+                Ok(node) => {
+                    if self.ast {
+                        println!("{}", node);
+                    } else {
+                        println!("{}", node.evaluate());
+                    }
+                    0
                 }
-                0
+                Err(e) => {
+                    eprintln!("{}", e);
+                    1
+                }
             }
-            Err(e) => {
-                eprintln!("{}", e);
-                1
-            }
+        }
+        // Error on no input.
+        else {
+            eprintln!("No input provided");
+            1
         }
     }
 
-    fn start_interactive(&self) -> u8 {
+    fn start_interative(&self) -> u8 {
         if let Some(ref input) = self.input {
             eprintln!("Ignoring input: {}", input);
         }

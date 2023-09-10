@@ -1,5 +1,9 @@
 # Changelog for `tilted`
 
+## Unreleased
+
+- Switched from `argh` to `clap` for CLI
+
 ## Version 0.3.0
 
 - Added interactive mode and printing of AST nodes to CLI [`7450cb16`]

@@ -2,9 +2,9 @@
 
 use std::process::exit;
 
-use tilted::{self, Cli};
+use tilted::CliParser;
 
 fn main() {
-    let cli: Cli = argh::from_env();
+    let cli = CliParser::parse();
     exit(cli.start().into())
 }

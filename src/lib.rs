@@ -11,7 +11,7 @@ pub mod parser;
 
 pub use ast::{BinaryAction, BinaryNode, NodeBox, Number, PlainNode, UnaryAction, UnaryNode};
 #[cfg(feature = "cli")]
-pub use cli::Cli;
+pub use cli::CliParser;
 pub use error::{LexError, ParseError, TilError};
 pub use lexer::{Function, Lexer, Operator, Span, Token, TokenKind};
 pub use parser::Parser;
