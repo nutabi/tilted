@@ -26,7 +26,7 @@ as a dependency to your project. Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tilted = { version = "=0.3.0", features = [] }
+tilted = { version = "0.4.0-beta.2", features = [] }
 ```
 
 `tilted` comes with all features enabled by default, including the `cli` feature
@@ -37,15 +37,16 @@ that provides for the executable.
 The help message can be printed with `tilted --help`:
 
 ```text
-Usage: tilted [<input>] [-p] [-r]
+A toy mathematical interpreter written in Rust.
 
-A non-Turing-complete interpreted programming 'language' that can do maths (only).
+Usage: tilted [OPTIONS] [INPUT]
 
-Positional Arguments:
-  input             user input
+Arguments:
+  [INPUT]  user input
 
 Options:
-  -p, --ast         print the AST
-  -r, --repr        enable interactive (read-eval-print-loop) mode
-  --help            display usage information
+  -p, --ast      print the AST instead of the result
+  -r, --repl     enable interactive (read-eval-print-loop) mode
+  -h, --help     Print help
+  -V, --version  Print version
 ```
